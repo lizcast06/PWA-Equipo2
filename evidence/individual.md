@@ -1,7 +1,7 @@
 # Evidencia individual — Semana 1
 
-## Integrante 1: (Nombre Completo de Integrante 1)
-- **Nombre:** Dana Lizbeth Castañeda Dánchez 
+## Integrante 1: (Dana Lizbeth Castañeda Sánchez)
+- **Nombre:** Dana Lizbeth Castañeda Sánchez 
 - **Repositorio y commit evaluado:** lizcast06/pwa-equipo2 (3a2c56eeb1c03e148e784e35620a5a47ba53a196)
 - **Mi contribución concreta:** Creación e inicialización del repositorio privado del equipo, invitación de colaboradores y redacción de las secciones 1 (Problema y contexto), 2 (Usuarios y escenarios de uso bajo conectividad intermitente) y 5 (Datos sintéticos y límites) en `docs/requirements.md`.
 - **Decisión técnica que puedo explicar:** La delimitación de los alcances del sistema y la definición de una política estricta de datos sintéticos para evitar la inclusión de credenciales, nombres reales o infraestructura sensible de la universidad.
@@ -9,17 +9,7 @@
 - **Qué comprueba y qué no:** Comprueba la correcta instalación determinista mediante lockfile y el renderizado funcional de la interfaz en modo desarrollo. No comprueba empaquetado de producción ni capacidades offline.
 - **Limitación o riesgo que encontré:** Dificultad para modelar escenarios realistas de campo sin depender de datos de infraestructura real del campus.
 - **Uso de IA:** Se utilizó Gemini para estructurar la redacción formal de los escenarios de usuario; validado y adaptado personalmente al contexto de los laboratorios universitarios.
-## Integrante 1: Danna [confirmar apellidos]
-- **Nombre:** Danna [confirmar apellidos]
-- **Repositorio y commit evaluado:** https://github.com/lizcast06/PWA-Equipo2 — commit `3a2c56e` ("docs: definir problema, escenarios y política de datos sinteticos")
-- **Mi contribución concreta:** Redacción de las secciones 1 (Problema y contexto), 2 (Usuarios y escenarios, incluyendo el escenario de conectividad intermitente) y 5 (Datos sintéticos y límites) en `docs/requirements.md`.
-- **Decisión técnica que puedo explicar:** Definición del usuario principal (Inspector de Mantenimiento de Laboratorio) y de los dos escenarios base (conectividad estable vs. intermitente) sobre los que se apoyan los requisitos funcionales del equipo.
-- **Comando o prueba que ejecuté y resultado:** _[Danna: completa aquí qué comando corriste — por ejemplo `npm run dev` — y qué viste en pantalla]_.
-- **Qué comprueba y qué no:** Comprueba que el problema y los escenarios están delimitados y documentados; no comprueba por sí sola que el código implemente esos escenarios (eso corresponde a semanas futuras).
-- **Limitación o riesgo que encontré:** _[Danna: completa aquí una limitación real que hayas notado]_.
-- **Uso de IA:** _[Danna: indica si usaste alguna herramienta de IA, para qué y cómo validaste el resultado; si no usaste, escribe "No utilicé IA para esta sección"]_.
 
----
 
 ## Integrante 2: Abraham Cervantes Romero
 - **Nombre:** Abraham Cervantes Romero
@@ -39,18 +29,9 @@
 
 ---
 
-## Integrante 3: (Nombre Completo de Integrante 3)
+## Integrante 3: (Emmanuel Castro Salvador)
 - **Nombre:** Emmanuel Castro Salvador
 - **Repositorio y commit evaluado:** lizcast06/pwa-equipo2 (c9160fd93f25fe35c4f04da31fc2bbbfdea658ec)
-- **Mi contribución concreta:** Redacción técnica de las secciones 3 (Requisitos funcionales numerados y verificables), 4 (Requisitos no funcionales medibles) y 6 (Criterios de aceptación) en `docs/requirements.md`.
-- **Decisión técnica que puedo explicar:** Establecimiento de criterios de aceptación medibles y verificables (auditorías WCAG AA, métricas Core Web Vitals en red móvil y verificación reproducible mediante lockfile).
-- **Comando o prueba que ejecuté y resultado:** `npm test` y comprobación estructural con `bash public-tests/check.sh`. Ambos comandos finalizaron con éxito (código 0) confirmando que la suite mínima pasa sin fallos.
-- **Qué comprueba y qué no:** Comprueba que las aserciones de la prueba de inicio son válidas y que los archivos requeridos están en su ruta correcta. No certifica ausencia de vulnerabilidades de seguridad ni cobertura exhaustiva de pruebas de interfaz.
-- **Limitación o riesgo que encontré:** Establecer condiciones de aceptación verificables para la Semana 1 sin adelantar código ni implementar librerías que corresponden a semanas posteriores.
-- **Uso de IA:** Se utilizó Gemini para consultar la redacción técnica estándar de requisitos bajo IEEE 830; validado y filtrado manualmente.
-## Integrante 3: Amin Manne
-- **Nombre:** Amin Manne
-- **Repositorio y commit evaluado:** https://github.com/lizcast06/PWA-Equipo2 — commit `fd28356` ("docs: especificar requisitos funcionales, no funcionales y criterios s1")
 - **Mi contribución concreta:** Redacción de las secciones 3 (Requisitos funcionales RF-01 a RF-04), 4 (Requisitos no funcionales RNF-01 a RNF-06) y 6 (Criterios de aceptación de la Semana 1) en `docs/requirements.md`, vinculando cada RF a los escenarios definidos por el equipo y agregando su criterio de aceptación correspondiente.
 - **Decisión técnica que puedo explicar:** Vinculé RF-02 (consulta resiliente) y RF-04 (sincronización futura) al Escenario 2 de conectividad intermitente, y separé los RNF en seis dimensiones medibles (reproducibilidad, accesibilidad, seguridad, privacidad, rendimiento y offline futuro) indicando cómo y cuándo se comprobaría cada uno.
 - **Comando o prueba que ejecuté y resultado:** `npm run verify`. Resultado real: `Starter verificable: PASS`, generando `reports/verification.json` con `"status": "pass"`. También resolví un conflicto de fusión real en `docs/requirements.md` al integrar mi commit con el de una compañera (`git pull`, `git stash`, `git stash pop`, resolución manual del conflicto).
