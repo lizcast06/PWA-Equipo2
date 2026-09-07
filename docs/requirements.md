@@ -4,25 +4,41 @@
 
 ## 1. Problema y contexto
 
-Describe qué problema de inspecciones de mantenimiento se quiere resolver, en qué contexto de conectividad y qué queda fuera del alcance.
+En los laboratorios de la Universidad Tecnológica de Tehuacán (UTT), el personal técnico e 
+inspectores requieren registrar inspecciones de mantenimiento, consultar antecedentes y dar 
+seguimiento a hallazgos. Las instalaciones sufren de conectividad intermitente o nula en 
+sótanos y áreas blindadas. La solución debe ser una Aplicación Web Progresiva (PWA) 
+instalable, resiliente y verificable que garantice que la captura y consulta de datos no se 
+detengan ante la falta de red. 
 
 ## 2. Usuarios y escenarios
 
-Identifica los usuarios principales y escribe al menos dos escenarios observables, incluyendo uno con conectividad intermitente.
+Usuario principal: Inspector de Mantenimiento de Laboratorio (Rol técnico). 
+● Escenario 1 (Conectividad estable): El inspector inicia la aplicación en la oficina con 
+conexión a red, navega por el App Shell y consulta las inspecciones registradas 
+previamente. 
+● Escenario 2 (Conectividad intermitente / Offline): El inspector ingresa al laboratorio de 
+Química en el sótano donde se pierde la señal. La PWA mantiene la interfaz activa (App 
+Shell), permite consultar los antecedentes guardados en caché local y registrar nuevos 
+hallazgos sin congelar la aplicación ni mostrar pantallas de error. 
 
 ## 3. Requisitos funcionales
 
-Escribe requisitos numerados con formato verificable (por ejemplo, RF-01). Cada requisito debe incluir una condición de aceptación.
+> *[Pendiente — Marcador para actualización posterior]*
 
 ## 4. Requisitos no funcionales
 
-Incluye requisitos medibles de reproducibilidad, accesibilidad, seguridad, privacidad, rendimiento y operación offline futura.
+> *[Pendiente — Marcador para actualización posterior]*
 
 ## 5. Datos sintéticos y límites
 
-Explica qué datos se usarán para la actividad y qué información está prohibida.
+Dentro del alcance: Inspecciones sintéticas de laboratorio, interfaz Next.js con App Router, 
+verificación automatizada mediante scripts de prueba local y CI. 
+Fuera del alcance: Datos reales de alumnos o docentes de la UTT, integraciones 
+institucionales reales, pasarelas de pago, autenticación real o despliegue completo de PWA 
+(manifest/service worker) en esta Semana 01. 
 
 ## 6. Criterios de aceptación de la Semana 1
 
-Relaciona cada entrega con una prueba o comando que permita verificarla.
+> *[Pendiente — Marcador para actualización posterior]*
 
