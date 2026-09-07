@@ -1,7 +1,7 @@
 # Evidencia individual — Semana 1
 
-## Integrante 1: Dana Lizbeth Castañeda Dánchez
-- **Nombre:** Dana Lizbeth Castañeda Dánchez
+## Integrante 1: Dana Lizbeth Castañeda Sánchez
+- **Nombre:** Dana Lizbeth Castañeda Sánchez
 - **Repositorio y commit evaluado:** https://github.com/lizcast06/PWA-Equipo2 — commit `3a2c56e` ("docs: definir problema, escenarios y política de datos sinteticos")
 - **Mi contribución concreta:** Creación e inicialización del repositorio privado del equipo, invitación de colaboradores y redacción de las secciones 1 (Problema y contexto), 2 (Usuarios y escenarios de uso bajo conectividad intermitente) y 5 (Datos sintéticos y límites) en `docs/requirements.md`.
 - **Decisión técnica que puedo explicar:** La delimitación de los alcances del sistema y la definición de una política estricta de datos sintéticos para evitar la inclusión de credenciales, nombres reales o infraestructura sensible de la universidad.
