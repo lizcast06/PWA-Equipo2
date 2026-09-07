@@ -1,10 +1,35 @@
-# Evidencia individual — completar antes de entregar
+# Evidencia individual — Semana 1
 
-- Nombre:
-- Repositorio y commit evaluado:
-- Mi contribución concreta:
-- Decisión técnica que puedo explicar:
-- Comando o prueba que ejecuté y resultado:
-- Limitación o riesgo que encontré:
-- Uso de IA (herramienta, propósito, fragmentos influenciados y validación humana):
+## Integrante 1: Danna [confirmar apellidos]
+- **Nombre:** Danna [confirmar apellidos]
+- **Repositorio y commit evaluado:** https://github.com/lizcast06/PWA-Equipo2 — commit `3a2c56e` ("docs: definir problema, escenarios y política de datos sinteticos")
+- **Mi contribución concreta:** Redacción de las secciones 1 (Problema y contexto), 2 (Usuarios y escenarios, incluyendo el escenario de conectividad intermitente) y 5 (Datos sintéticos y límites) en `docs/requirements.md`.
+- **Decisión técnica que puedo explicar:** Definición del usuario principal (Inspector de Mantenimiento de Laboratorio) y de los dos escenarios base (conectividad estable vs. intermitente) sobre los que se apoyan los requisitos funcionales del equipo.
+- **Comando o prueba que ejecuté y resultado:** _[Danna: completa aquí qué comando corriste — por ejemplo `npm run dev` — y qué viste en pantalla]_.
+- **Qué comprueba y qué no:** Comprueba que el problema y los escenarios están delimitados y documentados; no comprueba por sí sola que el código implemente esos escenarios (eso corresponde a semanas futuras).
+- **Limitación o riesgo que encontré:** _[Danna: completa aquí una limitación real que hayas notado]_.
+- **Uso de IA:** _[Danna: indica si usaste alguna herramienta de IA, para qué y cómo validaste el resultado; si no usaste, escribe "No utilicé IA para esta sección"]_.
 
+---
+
+## Integrante 2: Abraham Cervantes Romero
+- **Nombre:** Abraham Cervantes Romero
+- **Repositorio y commit evaluado:** https://github.com/lizcast06/PWA-Equipo2 — commit `68edabf` ("docs: completar adr-001 con matriz comparativa y justificacion pwa")
+- **Mi contribución concreta:** Redacción técnica integral del registro arquitectónico `docs/decision-record.md` (ADR-001), elaborando la matriz comparativa de las cuatro opciones (PWA, Web Tradicional, Nativa y Multiplataforma), así como la justificación técnica de la selección de Next.js PWA.
+- **Decisión técnica que puedo explicar:** Justificación de la arquitectura PWA frente a una aplicación nativa o multiplataforma. El modelo PWA elimina la fricción y costo de publicación en tiendas oficiales, garantizando soporte offline mediante Service Workers con una única base de código TypeScript.
+- **Comando o prueba que ejecuté y resultado:** `npm run verify`. Ejecución exitosa con código de salida 0, generando `reports/verification.json` con `status: pass`.
+- **Qué comprueba y qué no:** Comprueba la integridad estructural del starter y la compilación limpia de Next.js. No comprueba el registro de Service Workers ni la instalación del Web App Manifest (previsto para semanas futuras).
+- **Limitación o riesgo que encontré:** Las discrepancias en políticas de almacenamiento y cuotas de Cache API entre motores de navegación (WebKit/Safari en iOS frente a Blink/Chromium en Android) que deberán resolverse cuando se implemente el Service Worker.
+- **Uso de IA:** Se utilizó Gemini como apoyo en la síntesis y comparación multidimensional de las alternativas tecnológicas; la revisión técnica, justificación contextual y pruebas fueron ejecutadas y verificadas por mí.
+
+---
+
+## Integrante 3: Amin Manne
+- **Nombre:** Amin Manne
+- **Repositorio y commit evaluado:** https://github.com/lizcast06/PWA-Equipo2 — commit `fd28356` ("docs: especificar requisitos funcionales, no funcionales y criterios s1")
+- **Mi contribución concreta:** Redacción de las secciones 3 (Requisitos funcionales RF-01 a RF-04), 4 (Requisitos no funcionales RNF-01 a RNF-06) y 6 (Criterios de aceptación de la Semana 1) en `docs/requirements.md`, vinculando cada RF a los escenarios definidos por el equipo y agregando su criterio de aceptación correspondiente.
+- **Decisión técnica que puedo explicar:** Vinculé RF-02 (consulta resiliente) y RF-04 (sincronización futura) al Escenario 2 de conectividad intermitente, y separé los RNF en seis dimensiones medibles (reproducibilidad, accesibilidad, seguridad, privacidad, rendimiento y offline futuro) indicando cómo y cuándo se comprobaría cada uno.
+- **Comando o prueba que ejecuté y resultado:** `npm run verify`. Resultado real: `Starter verificable: PASS`, generando `reports/verification.json` con `"status": "pass"`. También resolví un conflicto de fusión real en `docs/requirements.md` al integrar mi commit con el de una compañera (`git pull`, `git stash`, `git stash pop`, resolución manual del conflicto).
+- **Qué comprueba y qué no:** Comprueba que el proyecto instala, compila y pasa la prueba mínima provista, y que el documento de requisitos está completo y coherente. No comprueba manifest, Service Worker, sincronización real ni pruebas de accesibilidad automatizadas (quedan para semanas posteriores).
+- **Limitación o riesgo que encontré:** Al trabajar en paralelo con el resto del equipo sobre el mismo archivo `docs/requirements.md`, tuve un conflicto de fusión real entre mi contenido (secciones 3 y 4) y los marcadores "pendiente" que había dejado mi compañera; se resolvió manualmente sin perder el trabajo de nadie.
+- **Uso de IA:** Utilicé el asistente de IA integrado en Cursor (Claude) para redactar un primer borrador de los RF/RNF y los criterios de aceptación a partir del caso de estudio del curso, para resolver el conflicto de fusión en Git y para revisar que la evidencia de mis compañeros reflejara trabajo real y no contenido genérico. Validé manualmente cada requisito contra el enunciado de la actividad y ejecuté yo mismo `npm run verify` para confirmar el resultado.
