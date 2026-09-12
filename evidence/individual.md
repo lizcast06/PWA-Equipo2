@@ -1,8 +1,14 @@
 # Evidencia individual — Semana 1
 
+<<<<<<< HEAD
 ## Integrante 1: (Dana Lizbeth Castañeda Sánchez)
 - **Nombre:** Dana Lizbeth Castañeda Sánchez 
 - **Repositorio y commit evaluado:** lizcast06/pwa-equipo2 (3a2c56eeb1c03e148e784e35620a5a47ba53a196)
+=======
+## Integrante 1: Dana Lizbeth Castañeda Sánchez
+- **Nombre:** Dana Lizbeth Castañeda Sánchez
+- **Repositorio y commit evaluado:** https://github.com/lizcast06/PWA-Equipo2 — commit `3a2c56e` ("docs: definir problema, escenarios y política de datos sinteticos")
+>>>>>>> 3e92edce4e951d980eea6f70964e4e626b5df1c0
 - **Mi contribución concreta:** Creación e inicialización del repositorio privado del equipo, invitación de colaboradores y redacción de las secciones 1 (Problema y contexto), 2 (Usuarios y escenarios de uso bajo conectividad intermitente) y 5 (Datos sintéticos y límites) en `docs/requirements.md`.
 - **Decisión técnica que puedo explicar:** La delimitación de los alcances del sistema y la definición de una política estricta de datos sintéticos para evitar la inclusión de credenciales, nombres reales o infraestructura sensible de la universidad.
 - **Comando o prueba que ejecuté y resultado:** `npm ci && npm run dev`. El servidor inició exitosamente en `http://localhost:3000` desplegando la interfaz inicial con los 3 registros sintéticos de prueba sin errores de consola.
@@ -13,12 +19,6 @@
 
 ## Integrante 2: Abraham Cervantes Romero
 - **Nombre:** Abraham Cervantes Romero
-- **Repositorio y commit evaluado:** lizcast06/pwa-equipo2 (68edabf3f29229b9afc0c5652c5b41d3fb8a0a5e)
-- **Mi contribución concreta:** Redacción técnica integral del registro arquitectónico `docs/decision-record.md` (ADR-001), elaborando la matriz comparativa de las cuatro opciones (PWA, Web Tradicional, Nativa y Multiplataforma), así como la justificación técnica de la selección de Next.js PWA.
-- **Decisión técnica que puedo explicar:** Justificación de la arquitectura PWA frente a una aplicación nativa o multiplataforma. Defiendo que el modelo PWA elimina la fricción y costo de publicación en tiendas oficiales, garantizando soporte offline mediante Service Workers con una única base de código TypeScript.
-- **Comando o prueba que ejecuté y resultado:** `npm run verify`. Ejecución exitosa con código de salida 0. Pasó la prueba unitaria base `tests/starter.spec.mjs` y compiló el proyecto Next.js en producción, generando `reports/verification.json`.
-- **Qué comprueba y qué no:** Comprueba la integridad estructural del starter, consistencia de archivos y compilación limpia de Next.js en producción. No comprueba el registro de Service Workers ni la instalación del Web App Manifest (previsto para semanas futuras).
-- **Limitación o riesgo que encontré:** Las discrepancias en políticas de almacenamiento y cuotas de Cache API entre motores de navegación (WebKit/Safari en iOS frente a Blink/Chromium en Android).
 - **Repositorio y commit evaluado:** https://github.com/lizcast06/PWA-Equipo2 — commit `68edabf` ("docs: completar adr-001 con matriz comparativa y justificacion pwa")
 - **Mi contribución concreta:** Redacción técnica integral del registro arquitectónico `docs/decision-record.md` (ADR-001), elaborando la matriz comparativa de las cuatro opciones (PWA, Web Tradicional, Nativa y Multiplataforma), así como la justificación técnica de la selección de Next.js PWA.
 - **Decisión técnica que puedo explicar:** Justificación de la arquitectura PWA frente a una aplicación nativa o multiplataforma. El modelo PWA elimina la fricción y costo de publicación en tiendas oficiales, garantizando soporte offline mediante Service Workers con una única base de código TypeScript.
@@ -29,9 +29,15 @@
 
 ---
 
+<<<<<<< HEAD
 ## Integrante 3: (Emmanuel Castro Salvador)
 - **Nombre:** Emmanuel Castro Salvador
 - **Repositorio y commit evaluado:** lizcast06/pwa-equipo2 (c9160fd93f25fe35c4f04da31fc2bbbfdea658ec)
+=======
+## Integrante 3: Emmanuel Castro Salvador
+- **Nombre:** Emmanuel Castro Salvador
+- **Repositorio y commit evaluado:** https://github.com/lizcast06/PWA-Equipo2 — commit `fd28356` ("docs: especificar requisitos funcionales, no funcionales y criterios s1")
+>>>>>>> 3e92edce4e951d980eea6f70964e4e626b5df1c0
 - **Mi contribución concreta:** Redacción de las secciones 3 (Requisitos funcionales RF-01 a RF-04), 4 (Requisitos no funcionales RNF-01 a RNF-06) y 6 (Criterios de aceptación de la Semana 1) en `docs/requirements.md`, vinculando cada RF a los escenarios definidos por el equipo y agregando su criterio de aceptación correspondiente.
 - **Decisión técnica que puedo explicar:** Vinculé RF-02 (consulta resiliente) y RF-04 (sincronización futura) al Escenario 2 de conectividad intermitente, y separé los RNF en seis dimensiones medibles (reproducibilidad, accesibilidad, seguridad, privacidad, rendimiento y offline futuro) indicando cómo y cuándo se comprobaría cada uno.
 - **Comando o prueba que ejecuté y resultado:** `npm run verify`. Resultado real: `Starter verificable: PASS`, generando `reports/verification.json` con `"status": "pass"`. También resolví un conflicto de fusión real en `docs/requirements.md` al integrar mi commit con el de una compañera (`git pull`, `git stash`, `git stash pop`, resolución manual del conflicto).
