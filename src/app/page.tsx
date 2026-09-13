@@ -8,8 +8,10 @@ export default function HomePage() {
     <AppShell activeRoute="/">
       <div className="space-y-6">
         <div className="border-b border-slate-700 pb-4">
-          <h2 className="text-xl font-bold text-white tracking-tight">Bitácora de Inspecciones</h2>
-          <p className="text-sm text-slate-400">Registros de mantenimiento preventivo (Entorno sintético).</p>
+          <h2 className="text-xl font-bold text-white tracking-tight">Inspecciones de laboratorio</h2>
+          <p className="text-sm text-slate-400">
+            Bitácora de mantenimiento preventivo. Los datos mostrados son sintéticos.
+          </p>
         </div>
 
         {/* Estado Vacío (Empty State) */}
