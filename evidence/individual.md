@@ -6,7 +6,7 @@
 
 ## Integrante 1: Dana Lizbeth Castañeda Sánchez
 - **Estudiante:** Dana Lizbeth Castañeda Sánchez
-- **Commit SHA evaluado:** [SHA_FINAL_DE_40_CARACTERES]
+- **Commit SHA evaluado:** fcd2799c830741cf635d74d9f8e9d8ed98d91aca
 - **Decisión técnica que puedo explicar:** Declaración de metadatos y configuración del Web App Manifest en `public/manifest.webmanifest`. Se estableció `display: "standalone"`, `start_url: "/"` y `scope: "/"` para garantizar que la aplicación web se comporte como aplicación independiente al instalarse en dispositivos móviles y de escritorio, suprimiendo la barra de navegación del explorador.
 - **Prueba que ejecuté y resultado:** Ejecución de `bash public-tests/check.sh` y verificación de `public/manifest.webmanifest`. Resultado: `PUBLIC_OK` tras constatar la existencia física de los cinco artefactos requeridos y la ausencia de credenciales o secretos en el árbol de archivos.
 - **Limitación o fallo diagnosticado:** El manifest declara iconos en resoluciones `192x192` y `512x512` requeridos por la especificación PWA; sin embargo, en esta semana no se incluyen los binarios PNG finales generados por diseño, dependiendo de assets base provisionales.
@@ -17,7 +17,7 @@
 
 ## Integrante 2: Abraham Cervantes Romero
 - **Estudiante:** Abraham Cervantes Romero
-- **Commit SHA evaluado:** [SHA_FINAL_DE_40_CARACTERES]
+- **Commit SHA evaluado:** cb90f159769bf65812e85c7d551d6bad7454b048
 - **Decisión técnica que puedo explicar:** Implementación de la suite de pruebas unitarias automatizadas en `tests/manifest.spec.ts`. Se estructuraron aserciones deterministas sobre el contrato de instalación PWA (presencia de claves obligatorias, coherencia de alcance de `start_url` y existencia de landmarks semánticos en el AppShell) sin depender de librerías externas pesadas.
 - **Prueba que ejecuté y resultado:** Ejecución de `npm run build && npm test`. Next.js compiló en modo producción con éxito (código 0) y el runner de pruebas completó todas las aserciones (`starter.spec.mjs: PASS` y `manifest.spec.ts: PASS`).
 - **Limitación o fallo diagnosticado:** La prueba valida la integridad estructural y sintáctica de los archivos en tiempo de compilación mediante el sistema de archivos, pero no simula el ciclo de vida del evento interactivo de instalación del navegador (`beforeinstallprompt`).
@@ -28,7 +28,7 @@
 
 ## Integrante 3: Emmanuel Castro Salvador
 - **Estudiante:** Emmanuel Castro Salvador
-- **Commit SHA evaluado:** [SHA_FINAL_DE_40_CARACTERES]
+- **Commit SHA evaluado:** 29f1b50feec290f3d60495336520a796a5138917
 - **Decisión técnica que puedo explicar:** Arquitectura del componente modular `src/components/app-shell.tsx` y su integración en `src/app/page.tsx`. Se aplicaron landmarks semánticos de accesibilidad (`role="banner"`, `role="main"`, `role="contentinfo"`) y se incorporaron los límites de interfaz para representar estados de carga/sincronización, estado vacío adaptativo y visualización normal de inspecciones.
 - **Prueba que ejecuté y resultado:** Ejecución de `npm run dev` en `http://localhost:3000`. Comprobé la navegación por teclado (tab focus) a través de los landmarks semánticos y el despliegue del componente ante datos sintéticos y colecciones vacías.
 - **Limitación o fallo diagnosticado:** La barra de navegación inferior móvil (`role="navigation"`) enlaza a identificadores de anclaje provisionales (`#pendientes`, `#config`) dado que el enrutamiento a vistas secundarias está fuera del alcance de la Semana 2.
