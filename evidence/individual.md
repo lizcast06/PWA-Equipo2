@@ -1,14 +1,47 @@
-# Evidencia individual — Semana 1
+# Evidencia individual del proyecto
 
-<<<<<<< HEAD
-## Integrante 1: (Dana Lizbeth Castañeda Sánchez)
-- **Nombre:** Dana Lizbeth Castañeda Sánchez 
-- **Repositorio y commit evaluado:** lizcast06/pwa-equipo2 (3a2c56eeb1c03e148e784e35620a5a47ba53a196)
-=======
+---
+
+# Semana 2: App shell instalable y manifest
+
+## Integrante 1: Dana Lizbeth Castañeda Sánchez
+- **Estudiante:** Dana Lizbeth Castañeda Sánchez
+- **Commit SHA evaluado:** [SHA_FINAL_DE_40_CARACTERES]
+- **Decisión técnica que puedo explicar:** Declaración de metadatos y configuración del Web App Manifest en `public/manifest.webmanifest`. Se estableció `display: "standalone"`, `start_url: "/"` y `scope: "/"` para garantizar que la aplicación web se comporte como aplicación independiente al instalarse en dispositivos móviles y de escritorio, suprimiendo la barra de navegación del explorador.
+- **Prueba que ejecuté y resultado:** Ejecución de `bash public-tests/check.sh` y verificación de `public/manifest.webmanifest`. Resultado: `PUBLIC_OK` tras constatar la existencia física de los cinco artefactos requeridos y la ausencia de credenciales o secretos en el árbol de archivos.
+- **Limitación o fallo diagnosticado:** El manifest declara iconos en resoluciones `192x192` y `512x512` requeridos por la especificación PWA; sin embargo, en esta semana no se incluyen los binarios PNG finales generados por diseño, dependiendo de assets base provisionales.
+- **Cambio que podría defender o modificar en vivo:** Ajustar los valores hexadecimales de `theme_color` (#0284c7) y `background_color` (#0f172a) en el manifest y layout para cumplir con las pautas de accesibilidad y contraste WCAG AA.
+- **Uso declarado de IA (herramienta, propósito, validación):** Se utilizó Gemini para corroborar la especificación W3C de campos del manifest y compatibilidad en navegadores móviles; la configuración e integración de rutas fue realizada y validada manualmente.
+
+---
+
+## Integrante 2: Abraham Cervantes Romero
+- **Estudiante:** Abraham Cervantes Romero
+- **Commit SHA evaluado:** [SHA_FINAL_DE_40_CARACTERES]
+- **Decisión técnica que puedo explicar:** Implementación de la suite de pruebas unitarias automatizadas en `tests/manifest.spec.ts`. Se estructuraron aserciones deterministas sobre el contrato de instalación PWA (presencia de claves obligatorias, coherencia de alcance de `start_url` y existencia de landmarks semánticos en el AppShell) sin depender de librerías externas pesadas.
+- **Prueba que ejecuté y resultado:** Ejecución de `npm run build && npm test`. Next.js compiló en modo producción con éxito (código 0) y el runner de pruebas completó todas las aserciones (`starter.spec.mjs: PASS` y `manifest.spec.ts: PASS`).
+- **Limitación o fallo diagnosticado:** La prueba valida la integridad estructural y sintáctica de los archivos en tiempo de compilación mediante el sistema de archivos, pero no simula el ciclo de vida del evento interactivo de instalación del navegador (`beforeinstallprompt`).
+- **Cambio que podría defender o modificar en vivo:** Ampliar las aserciones de `tests/manifest.spec.ts` para verificar de forma explícita que la orientación esté fijada en `portrait` y que los landmarks del shell incluyan atributos `aria-label` descriptivos.
+- **Uso declarado de IA (herramienta, propósito, validación):** Se utilizó Gemini para diagnosticar y corregir la incompatibilidad de resolución de módulos en `tsconfig.json` y el script de prueba en Windows/Node 20; la ejecución, depuración del build y validación del código fueron ejecutadas directamente por mí.
+
+---
+
+## Integrante 3: Emmanuel Castro Salvador
+- **Estudiante:** Emmanuel Castro Salvador
+- **Commit SHA evaluado:** [SHA_FINAL_DE_40_CARACTERES]
+- **Decisión técnica que puedo explicar:** Arquitectura del componente modular `src/components/app-shell.tsx` y su integración en `src/app/page.tsx`. Se aplicaron landmarks semánticos de accesibilidad (`role="banner"`, `role="main"`, `role="contentinfo"`) y se incorporaron los límites de interfaz para representar estados de carga/sincronización, estado vacío adaptativo y visualización normal de inspecciones.
+- **Prueba que ejecuté y resultado:** Ejecución de `npm run dev` en `http://localhost:3000`. Comprobé la navegación por teclado (tab focus) a través de los landmarks semánticos y el despliegue del componente ante datos sintéticos y colecciones vacías.
+- **Limitación o fallo diagnosticado:** La barra de navegación inferior móvil (`role="navigation"`) enlaza a identificadores de anclaje provisionales (`#pendientes`, `#config`) dado que el enrutamiento a vistas secundarias está fuera del alcance de la Semana 2.
+- **Cambio que podría defender o modificar en vivo:** Modificar la sección del empty state en `src/app/page.tsx` para agregar un botón interactivo de recarga o registro inicial.
+- **Uso declarado de IA (herramienta, propósito, validación):** Se utilizó Gemini para generar la estructura semántica de landmarks accesibles en el cascarón; los componentes, props de TypeScript y la integración con las vistas fueron adaptados y comprobados manualmente.
+
+---
+
+# Historial acumulativo — Semana 1
+
 ## Integrante 1: Dana Lizbeth Castañeda Sánchez
 - **Nombre:** Dana Lizbeth Castañeda Sánchez
 - **Repositorio y commit evaluado:** https://github.com/lizcast06/PWA-Equipo2 — commit `3a2c56e` ("docs: definir problema, escenarios y política de datos sinteticos")
->>>>>>> 3e92edce4e951d980eea6f70964e4e626b5df1c0
 - **Mi contribución concreta:** Creación e inicialización del repositorio privado del equipo, invitación de colaboradores y redacción de las secciones 1 (Problema y contexto), 2 (Usuarios y escenarios de uso bajo conectividad intermitente) y 5 (Datos sintéticos y límites) en `docs/requirements.md`.
 - **Decisión técnica que puedo explicar:** La delimitación de los alcances del sistema y la definición de una política estricta de datos sintéticos para evitar la inclusión de credenciales, nombres reales o infraestructura sensible de la universidad.
 - **Comando o prueba que ejecuté y resultado:** `npm ci && npm run dev`. El servidor inició exitosamente en `http://localhost:3000` desplegando la interfaz inicial con los 3 registros sintéticos de prueba sin errores de consola.
@@ -16,6 +49,7 @@
 - **Limitación o riesgo que encontré:** Dificultad para modelar escenarios realistas de campo sin depender de datos de infraestructura real del campus.
 - **Uso de IA:** Se utilizó Gemini para estructurar la redacción formal de los escenarios de usuario; validado y adaptado personalmente al contexto de los laboratorios universitarios.
 
+---
 
 ## Integrante 2: Abraham Cervantes Romero
 - **Nombre:** Abraham Cervantes Romero
@@ -29,15 +63,9 @@
 
 ---
 
-<<<<<<< HEAD
-## Integrante 3: (Emmanuel Castro Salvador)
-- **Nombre:** Emmanuel Castro Salvador
-- **Repositorio y commit evaluado:** lizcast06/pwa-equipo2 (c9160fd93f25fe35c4f04da31fc2bbbfdea658ec)
-=======
 ## Integrante 3: Emmanuel Castro Salvador
 - **Nombre:** Emmanuel Castro Salvador
 - **Repositorio y commit evaluado:** https://github.com/lizcast06/PWA-Equipo2 — commit `fd28356` ("docs: especificar requisitos funcionales, no funcionales y criterios s1")
->>>>>>> 3e92edce4e951d980eea6f70964e4e626b5df1c0
 - **Mi contribución concreta:** Redacción de las secciones 3 (Requisitos funcionales RF-01 a RF-04), 4 (Requisitos no funcionales RNF-01 a RNF-06) y 6 (Criterios de aceptación de la Semana 1) en `docs/requirements.md`, vinculando cada RF a los escenarios definidos por el equipo y agregando su criterio de aceptación correspondiente.
 - **Decisión técnica que puedo explicar:** Vinculé RF-02 (consulta resiliente) y RF-04 (sincronización futura) al Escenario 2 de conectividad intermitente, y separé los RNF en seis dimensiones medibles (reproducibilidad, accesibilidad, seguridad, privacidad, rendimiento y offline futuro) indicando cómo y cuándo se comprobaría cada uno.
 - **Comando o prueba que ejecuté y resultado:** `npm run verify`. Resultado real: `Starter verificable: PASS`, generando `reports/verification.json` con `"status": "pass"`. También resolví un conflicto de fusión real en `docs/requirements.md` al integrar mi commit con el de una compañera (`git pull`, `git stash`, `git stash pop`, resolución manual del conflicto).
