@@ -1,4 +1,7 @@
-import React from "react";
+"use client";
+
+import React, { useEffect } from "react";
+import { registerServiceWorker } from "../lib/pwa/register-service-worker";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -7,6 +10,10 @@ interface AppShellProps {
 }
 
 export function AppShell({ children, activeRoute = "/", isSyncing = false }: AppShellProps) {
+  useEffect(() => {
+    registerServiceWorker();
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-900 text-slate-100 font-sans">
       <header className="sticky top-0 z-50 bg-slate-800/90 backdrop-blur border-b border-slate-700 px-4 py-3 flex items-center justify-between" role="banner">
@@ -16,7 +23,7 @@ export function AppShell({ children, activeRoute = "/", isSyncing = false }: App
           </div>
           <div>
             <h1 className="text-sm font-semibold leading-none">Inspecciones UTT</h1>
-            <span className="text-xs text-slate-400">PWA Shell · Semana 2</span>
+            <span className="text-xs text-slate-400">PWA Shell &amp; Service Worker · Semana 3</span>
           </div>
         </div>
         <div className="flex items-center space-x-2">
@@ -26,7 +33,7 @@ export function AppShell({ children, activeRoute = "/", isSyncing = false }: App
             </span>
           )}
           <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-            Modo Shell
+            Offline Ready
           </span>
         </div>
       </header>
