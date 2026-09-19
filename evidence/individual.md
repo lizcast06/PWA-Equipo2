@@ -1,6 +1,40 @@
 # Evidencia individual del proyecto
 
 ---
+# Semana 3: Service worker y consulta offline
+
+## Integrante 1: Dana Lizbeth Castañeda Sánchez
+- **Estudiante:** Dana Lizbeth Castañeda Sánchez
+- **Commit SHA evaluado:** fc9fed86a4e6f0ae8dbe50b489eea469fe945a34
+- **Decisión técnica que puedo explicar:** Definición de la matriz de estrategias de almacenamiento en `docs/cache-strategy.md`, seleccionando un modelo híbrido Network-First con fallback a caché estática para documentos HTML navegables y Cache-First para assets inmutables.
+- **Prueba que ejecuté y resultado:** `bash public-tests/check.sh`. Resultado: `PUBLIC_OK`, confirmando la existencia de los cinco artefactos requeridos para la Semana 3 y la ausencia de cadenas de secretos o tokens.
+- **Limitación o fallo diagnosticado:** Los recursos servidos por dominios de terceros o fuentes externas no se almacenan en tiempo de ejecución para evitar contaminación de cuota en el navegador.
+- **Cambio que podría defender o modificar en vivo:** Ajustar los nombres de versión de caché (`pwa-inspecciones-static-v2`) para forzar una invalidación manual inmediata durante la activación.
+- **Uso declarado de IA (herramienta, propósito, validación):** Se utilizó Gemini para esquematizar la tabla comparativa de estrategias de caché; la validación técnica fue contrastada con los requisitos de la rúbrica.
+
+---
+
+## Integrante 2: Emmanuel Castro Salvador
+- **Estudiante:** Emmanuel Castro Salvador
+- **Commit SHA evaluado:** 2561afb7b9efa77952705ea945e53e339d63378c
+- **Decisión técnica que puedo explicar:** Implementación del ciclo de vida del Service Worker en `public/sw.js` utilizando `self.skipWaiting()` durante la instalación y `clients.claim()` junto con `caches.delete()` en la activación, asegurando que no se sirvan versiones huérfanas o corruptas del App Shell.
+- **Prueba que ejecuté y resultado:** `npm run dev` y registro en el navegador. Se constató en DevTools > Application > Service Workers que el worker queda activo en el scope `/` y el evento `fetch` intercepta peticiones.
+- **Limitación o fallo diagnosticado:** En modo incógnito o en navegadores con cuotas de almacenamiento estrictas (WebKit en iOS), la Cache API puede depurarse automáticamente ante falta de espacio en disco.
+- **Cambio que podría defender o modificar en vivo:** Modificar el enrutador de peticiones en `public/sw.js` para incluir una página dedicada `offline.html` en lugar de redirigir a `/`.
+- **Uso declarado de IA (herramienta, propósito, validación):** Se utilizó Gemini para revisar la estructura del listener `fetch`; el control de promesas y métodos de caché se depuraron manualmente.
+
+---
+
+## Integrante 3: Abraham Cervantes Romero
+- **Estudiante:** Abraham Cervantes Romero
+- **Commit SHA evaluado:** 7121853886da0d32a3e135cc9a6fa3059a759305
+- **Decisión técnica que puedo explicar:** Diseño y codificación de las pruebas automatizadas en `tests/service-worker.spec.ts` y `tests/offline.spec.ts`. Se implementaron validaciones estáticas sobre el AST/contenido de los archivos para verificar la presencia de manejadores `install`, `activate`, `fetch`, reclamo de clientes e inclusión de artefactos en el precache.
+- **Prueba que ejecuté y resultado:** `npm run build && npm test`. El build de producción completó con éxito (código 0) y el runner de pruebas pasó deterministamente las suites acumulativas (`service-worker.spec.ts: PASS` y `offline.spec.ts: PASS`).
+- **Limitación o fallo diagnosticado:** Las pruebas validan la sintaxis e invariantes en Node sin levantar un contexto completo de Chromium/Puppeteer para probar la API `caches` en runtime.
+- **Cambio que podría defender o modificar en vivo:** Añadir aserciones específicas en `tests/offline.spec.ts` para verificar que el arreglo `PRECACHE_ASSETS` no esté vacío.
+- **Uso declarado de IA (herramienta, propósito, validación):** Se utilizó Gemini para estructurar aserciones deterministas basadas en expresiones regulares sin dependencias externas pesadas; validado y ejecutado en local.
+
+---
 
 # Semana 2: App shell instalable y manifest
 
