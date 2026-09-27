@@ -12,6 +12,11 @@ export default function HomePage() {
           <p className="text-sm text-slate-400">
             Bitácora de mantenimiento preventivo. Los datos mostrados son sintéticos.
           </p>
+          <p className="mt-3">
+            <a href="/inspecciones" className="text-sm text-sky-400 hover:text-sky-300 font-medium">
+              Abrir catálogo SSR de inspecciones
+            </a>
+          </p>
         </div>
 
         {/* Estado Vacío (Empty State) */}

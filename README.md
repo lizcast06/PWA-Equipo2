@@ -19,6 +19,12 @@ npm run dev
 
 Abre <http://localhost:3000>. Debes ver la pantalla inicial de inspecciones con datos sintéticos.
 
+Rutas de la Semana 4 (datos sintéticos):
+
+- Catálogo SSR: <http://localhost:3000/inspecciones>
+- Detalle CSR (ejemplo): <http://localhost:3000/inspecciones/inspection-001>
+- Detalle con error (id inexistente): <http://localhost:3000/inspecciones/no-existe>
+
 Antes de entregar ejecuta:
 
 ```bash
