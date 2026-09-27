@@ -45,7 +45,7 @@ export function AppShell({ children, activeRoute = "/", isSyncing = false }: App
       <nav className="sticky bottom-0 z-50 bg-slate-800 border-t border-slate-700 px-6 py-2 md:hidden" role="navigation" aria-label="Navegación móvil">
         <ul className="flex justify-around items-center">
           <li>
-            <a href="/" className={`text-xs flex flex-col items-center ${activeRoute === "/" ? "text-sky-400 font-semibold" : "text-slate-400"}`}>
+            <a href="/inspecciones" className={`text-xs flex flex-col items-center ${activeRoute === "/" || activeRoute === "/inspecciones" ? "text-sky-400 font-semibold" : "text-slate-400"}`}>
               <span>Inspecciones</span>
             </a>
           </li>
