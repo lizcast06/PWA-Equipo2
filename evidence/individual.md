@@ -1,6 +1,48 @@
 # Evidencia individual del proyecto
 
 ---
+#### 2. Archivo: `evidence/individual.md`
+Colocar el bloque de la Semana 4 al inicio, conservando las semanas 3, 2 y 1 debajo[cite: 23, 24, 26]:
+```markdown
+# Evidencia individual del proyecto
+
+---
+
+# Semana 4: Renderizado CSR/SSR con estados verificables
+
+## Integrante 1: Dana Lizbeth Castañeda Sánchez
+- **Estudiante:** Dana Lizbeth Castañeda Sánchez
+- **Commit SHA evaluado:** 7d19bb376d29948fefb33f4fdfd06c19bc35a326
+- **Decisión técnica que puedo explicar:** Definición del componente de carga `src/components/loading-state.tsx` con atributos semánticos de accesibilidad (`role="status"` y `aria-live="polite"`), y elaboración de la matriz comparativa de trade-offs en `docs/rendering-decision.md` justificando el impacto en FCP y la prevención de hydration mismatch.
+- **Prueba que ejecuté y resultado:** `bash public-tests/check.sh` completado con resultado `PUBLIC_OK` tras verificar los 5 artefactos obligatorios y la ausencia de cadenas de credenciales en el repositorio.
+- **Limitación o fallo diagnosticado:** El componente de carga asume estilos basados en Tailwind CSS; si el bundle de estilos falla al cargar en red degradada, el spinner depende de animaciones CSS nativas.
+- **Cambio que podría defender o modificar en vivo:** Incorporar variantes de skeleton screens dentro de `loading-state.tsx` en lugar de un único spinner central.
+- **Uso declarado de IA (herramienta, propósito, validación):** Se utilizó Gemini para formular la estructura comparativa de FCP; las propiedades ARIA y los criterios fueron validados manualmente contra WCAG 2.1.
+
+---
+
+## Integrante 2: Emmanuel Castro Salvador
+- **Estudiante:** Emmanuel Castro Salvador
+- **Commit SHA evaluado:** 9df7b03f74019974b85b56525917c36419ed64ad
+- **Decisión técnica que puedo explicar:** Arquitectura dual de rutas en Next.js App Router: implementación de `/inspecciones` como Server Component para pre-renderizado del catálogo y `/inspecciones/[id]` como Client Component reactivo para interactividad en detalle con desacoplamiento de estado.
+- **Prueba que ejecuté y resultado:** `npm run dev` y navegación interactiva en `http://localhost:3000/inspecciones`. Se verificó la transición desde el catálogo hacia el detalle, observando el despliegue del loading state durante el montaje y el manejo de fallback visual ante un ID sintético inexistente.
+- **Limitación o fallo diagnosticado:** En la ruta CSR, la emulación de red depende de un temporizador en memoria; en un entorno sin conexión estricta, la consulta debe coordinarse con el Service Worker implementado en la Semana 3.
+- **Cambio que podría defender o modificar en vivo:** Agregar soporte de generación estática con `generateStaticParams` en la ruta dinámica para optimizar aún más el FCP de los IDs sintéticos conocidos.
+- **Uso declarado de IA (herramienta, propósito, validación):** Se utilizó Gemini para modelar el manejo de estados de carga/error en React; las interfaces de TypeScript y el ruteo se ajustaron y probaron manualmente.
+
+---
+
+## Integrante 3: Abraham Cervantes Romero
+- **Estudiante:** Abraham Cervantes Romero
+- **Commit SHA evaluado:** 14d2b14783949aa01490b5b043f8d7a1ce7d27ec
+- **Decisión técnica que puedo explicar:** Diseño e integración de la suite determinista `tests/rendering.spec.ts`. Se implementaron validaciones estáticas sobre las directivas de renderizado (`use client` en CSR y ausencia en SSR), la presencia de hooks de estado y ciclo de vida, accesibilidad de estados de carga y coherencia métrica en la documentación técnica.
+- **Prueba que ejecuté y resultado:** `npm run build && npm test`. El build de Next.js optimizó las páginas estáticas y dinámicas con código 0 y las 5 suites de pruebas acumulativas pasaron en verde (`rendering.spec.ts: PASS`).
+- **Limitación o fallo diagnosticado:** La suite valida la presencia sintáctica y modular de las directivas en tiempo de build, pero no emula la renderización con un DOM virtual completo tipo JSDOM.
+- **Cambio que podría defender o modificar en vivo:** Añadir aserciones en `tests/rendering.spec.ts` para verificar la existencia de etiquetas `aria-label` en la sección de listado SSR.
+- **Uso declarado de IA (herramienta, propósito, validación):** Se utilizó Gemini para el diseño de expresiones regulares de validación de directivas; la integración en `package.json`, depuración del build y ejecución local fueron efectuadas directamente por mí.
+
+---
+
 # Semana 3: Service worker y consulta offline
 
 ## Integrante 1: Dana Lizbeth Castañeda Sánchez
