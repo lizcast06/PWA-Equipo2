@@ -8,6 +8,41 @@ Colocar el bloque de la Semana 4 al inicio, conservando las semanas 3, 2 y 1 deb
 
 ---
 
+# Semana 5: Persistencia local y sincronización idempotente
+
+## Integrante 1: Dana Lizbeth Castañeda Sánchez
+- **Estudiante:** Dana Lizbeth Castañeda Sánchez
+- **Commit SHA evaluado:** 3e26bab3b5011509ddaae42b84916777373aca26
+- **Decisión técnica que puedo explicar:** Definición del esquema tipado en `src/lib/storage/schema.ts` y redacción de la especificación técnica en `docs/sync-policy.md`. Se formalizaron las estructuras de `StoredInspection` y `SyncQueueItem`, estableciendo identificadores únicos de mutación (`clientMutationId`) y un límite determinista de 3 reintentos antes de transferir elementos a estado no bloqueante.
+- **Prueba que ejecuté y resultado:** `bash public-tests/check.sh` con resultado `PUBLIC_OK` tras verificar los 5 artefactos requeridos y confirmar la ausencia de credenciales en el repositorio.
+- **Limitación o fallo diagnosticado:** El almacenamiento en esquema estático asume disponibilidad de storage del navegador; en navegación privada extrema con cuotas restringidas a 0 MB, la inserción local requiere captura de excepciones `QuotaExceededError`.
+- **Cambio que podría defender o modificar en vivo:** Agregar una función de validación de esquema en tiempo de ejecución (runtime schema parser) para rechazar mutaciones con tipos incompatibles antes de encolarlas.
+- **Uso declarado de IA (herramienta, propósito, validación):** Se utilizó Gemini para estructurar la matriz de reintentos; los campos del esquema y la configuración de stores fueron ajustados manualmente.
+
+---
+
+## Integrante 2: Emmanuel Castro Salvador
+- **Estudiante:** Emmanuel Castro Salvador
+- **Commit SHA evaluado:** e4bdc7e9017a783d5cd0fdf313350e5b7ac4be73
+- **Decisión técnica que puedo explicar:** Implementación de la cola de sincronización en `src/lib/sync/queue.ts` y el algoritmo de resolución de conflictos en `src/lib/sync/conflict-policy.ts`. Se garantizó la idempotencia verificando la existencia previa de `mutationId` tanto en memoria activa como en el conjunto de mutaciones procesadas, aplicando una regla LWW basada en versión estricta y desempate por timestamp.
+- **Prueba que ejecuté y resultado:** Simulación interactiva de desconexión y recuperación de red. Se confirmó que múltiples invocaciones con un mismo `clientMutationId` no duplicaron registros en cola y que ante divergencia de versiones se preservó la entidad con mayor jerarquía.
+- **Limitación o fallo diagnosticado:** Si el reloj del dispositivo cliente se encuentra descalibrado, el desempate por timestamp de Last-Write-Wins puede beneficiar a un cliente con desfase horario; por ello la versión numérica prevalece sobre la marca temporal.
+- **Cambio que podría defender o modificar en vivo:** Reemplazar el desempate por timestamp puro por un vector de versiones (Vector Clock) para detectar concurrencia real entre múltiples inspectores.
+- **Uso declarado de IA (herramienta, propósito, validación):** Se utilizó Gemini para modelar el ciclo de reintentos de la cola; la lógica de desempate y tipos de retorno fueron verificados manualmente.
+
+---
+
+## Integrante 3: Abraham Cervantes Romero
+- **Estudiante:** Abraham Cervantes Romero
+- **Commit SHA evaluado:** bd1e1039515b1a2f88372f01e4f069d515ca22b7
+- **Decisión técnica que puedo explicar:** Creación de la suite determinista `tests/sync.spec.ts` y su integración en el pipeline de validación (`package.json`). La prueba comprueba de manera aislada el rechazo de mutaciones duplicadas (idempotencia), el vaciado exitoso de la cola tras sincronización simulada, el incremento del contador de reintentos ante fallas de transporte y la resolución correcta del conflicto a favor del registro con versión superior.
+- **Prueba que ejecuté y resultado:** `npm run build && npm test`. El build finalizó con código 0 y las 6 suites acumulativas (starter, manifest, service-worker, offline, rendering y sync) pasaron en verde.
+- **Limitación o fallo diagnosticado:** La suite actual valida la cola y la resolución de conflictos a nivel unitario en memoria; no ejecuta transacciones reales contra IndexedDB sobre un motor Chromium sin headless browser.
+- **Cambio que podría defender o modificar en vivo:** Añadir aserciones adicionales en `tests/sync.spec.ts` que simulen la llegada de mutaciones fuera de orden cronológico.
+- **Uso declarado de IA (herramienta, propósito, validación):** Se utilizó Gemini para generar el esqueleto de las aserciones de prueba; la integración del script de pruebas en Node, depuración y validación local fueron efectuadas directamente por mí.
+
+---
+
 # Semana 4: Renderizado CSR/SSR con estados verificables
 
 ## Integrante 1: Dana Lizbeth Castañeda Sánchez
