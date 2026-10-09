@@ -1,13 +1,40 @@
 # Evidencia individual del proyecto
 
 ---
-#### 2. Archivo: `evidence/individual.md`
-Colocar el bloque de la Semana 4 al inicio, conservando las semanas 3, 2 y 1 debajo[cite: 23, 24, 26]:
-```markdown
-# Evidencia individual del proyecto
+# Semana 6: Capacidades del dispositivo y notificaciones
+
+## Integrante 1: Dana Lizbeth Castañeda Sánchez
+- **Estudiante:** Dana Lizbeth Castañeda Sánchez
+- **Commit SHA evaluado:** b2eba7934783de11765236afbef1f9226a0bd6b4
+- **Decisión técnica que puedo explicar:** Configuración del workflow de CI para la Semana 6 e implementación de los módulos `src/lib/device/camera.ts` y `src/lib/device/geolocation.ts`. Se estableció una arquitectura de fallback donde el acceso a hardware cuenta con alternativas directas: si la cámara webview rechaza el stream, se inyecta un input de captura por archivo; y si la geolocalización es denegada, se inyectan coordenadas sintéticas del campus UTT con la bandera `synthetic: true`.
+- **Prueba que ejecuté y resultado:** `bash public-tests/check.sh` con salida `PUBLIC_OK` tras verificar los 5 artefactos y confirmar la ausencia de tokens o secretos en el repositorio.
+- **Limitación o fallo diagnosticado:** El acceso a la cámara mediante `getUserMedia` requiere obligatoriamente contexto seguro (HTTPS o localhost); en entornos HTTP inseguros el navegador bloquea la API a nivel de política de seguridad del agente de usuario.
+- **Cambio que podría defender o modificar en vivo:** Agregar una validación explícita con `window.isSecureContext` antes de invocar `navigator.mediaDevices` para detonar el fallback de archivo de forma inmediata sin lanzar excepciones.
+- **Uso declarado de IA (herramienta, propósito, validación):** Se utilizó Gemini para modelar los tipos de retorno de geolocalización; los parámetros de timeout y coordenadas sintéticas fueron ajustados manualmente.
 
 ---
 
+## Integrante 2: Emmanuel Castro Salvador
+- **Estudiante:** Emmanuel Castro Salvador
+- **Commit SHA evaluado:** af8b676e942be3ed4b92b5b0f193a36e24411f6e
+- **Decisión técnica que puedo explicar:** Creación del despachador de notificaciones en `src/lib/notifications/client.ts` y formalización de la documentación en `docs/capabilities.md`. Se diseñó un orden jerárquico de entrega: se intenta despachar la alerta mediante la suscripción del Service Worker; si no está disponible, se recurre a la Notification API clásica; y si los permisos son denegados o no existe soporte, se activa el callback de degradación in-app para no romper la experiencia del usuario.
+- **Prueba que ejecuté y resultado:** Simulación de denegación de permisos de notificación en navegador. Se constató que `dispatchInspectionAlert` no arrojó un error fatal no controlado y entregó el mensaje correctamente a través del canal `IN_APP_FALLBACK`.
+- **Limitación o fallo diagnosticado:** En dispositivos móviles con iOS WebKit, la API de Notificaciones Push exige que la PWA esté explícitamente instalada en la pantalla de inicio para conceder permisos.
+- **Cambio que podría defender o modificar en vivo:** Incorporar un detector de estado de instalación PWA (`standalone`) para emitir una alerta explicativa al usuario en iOS antes de solicitar permisos de notificación.
+- **Uso declarado de IA (herramienta, propósito, validación):** Se utilizó Gemini para estructurar la matriz de estados de permisos; la lógica de degradación y el contenido de `docs/capabilities.md` fueron validados manualmente.
+
+---
+
+## Integrante 3: Abraham Cervantes Romero
+- **Estudiante:** Abraham Cervantes Romero
+- **Commit SHA evaluado:** a9af756176e437a7570e3ef24ff67cf8a4c8d516
+- **Decisión técnica que puedo explicar:** Implementación de la suite determinista `tests/capabilities.spec.ts` y su orquestación en el script `"test"` de `package.json`. La suite verifica de manera determinista los contratos de fallback para captura fotográfica, la provisión de geolocalización sintética ante permisos denegados, la disponibilidad de canales in-app para alertas y la completitud del reporte técnico.
+- **Prueba que ejecuté y resultado:** `npm run build && npm test`. El build de Next.js compiló sin incidencias (código 0) y las 7 suites acumulativas (starter, manifest, service-worker, offline, rendering, sync y capabilities) pasaron en verde.
+- **Limitación o fallo diagnosticado:** Las pruebas en entorno headless de CI no poseen acceso a sensores físicos de cámara o GPS reales, por lo que la comprobación unitaria se enfoca en la robustez de los contratos de degradación y fallbacks sintéticos.
+- **Cambio que podría defender o modificar en vivo:** Añadir pruebas E2E con mocks de `navigator.permissions` usando Playwright para emular las transiciones de permisos `prompt -> granted -> denied`.
+- **Uso declarado de IA (herramienta, propósito, validación):** Se utilizó Gemini para diseñar el esquema de aserciones de la suite de pruebas; la verificación en consola de Node 22 y el encadenamiento de scripts fueron ejecutados directamente por mí.
+
+---
 # Semana 5: Persistencia local y sincronización idempotente
 
 ## Integrante 1: Dana Lizbeth Castañeda Sánchez
