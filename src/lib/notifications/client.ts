@@ -47,14 +47,14 @@ export async function dispatchInspectionAlert(
       if (reg) {
         await reg.showNotification(payload.title, {
           body: payload.body,
-          icon: payload.icon || "/icons/icon-192.png",
+          icon: payload.icon || "/icon-192.png",
           data: payload.data,
         });
         return { dispatched: true, channel: "PUSH_SERVICE_WORKER", permission: "granted" };
       }
     }
 
-    new Notification(payload.title, { body: payload.body, icon: payload.icon });
+    new Notification(payload.title, { body: payload.body, icon: payload.icon || "/icon-192.png" });
     return { dispatched: true, channel: "NOTIFICATION_API", permission: "granted" };
   }
 

@@ -7,3 +7,6 @@ coverage/
 !.env.example
 reports/verification.json
 
+
+# TypeScript incremental
+tsconfig.tsbuildinfo

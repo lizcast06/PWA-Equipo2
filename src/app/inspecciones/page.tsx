@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AppShell } from "../../components/app-shell";
+import { LocalInspections } from "../../components/local-inspections";
 import { inspections } from "../../lib/data/inspections";
 
 export default function InspeccionesCatalogoSSRPage() {
@@ -18,9 +19,15 @@ export default function InspeccionesCatalogoSSRPage() {
               SSR (Server-Side Rendered)
             </span>
           </div>
-          <h2 className="text-xl font-bold text-white tracking-tight mt-2">
-            Catálogo de inspecciones
-          </h2>
+          <div className="flex items-end justify-between gap-3 mt-2">
+            <h2 className="text-xl font-bold text-white tracking-tight">Catálogo de inspecciones</h2>
+            <Link
+              href="/inspecciones/nueva"
+              className="shrink-0 inline-flex items-center px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-xs font-semibold text-white"
+            >
+              + Nueva
+            </Link>
+          </div>
           <p className="text-sm text-slate-400 mt-1">
             Listado renderizado en el servidor con datos sintéticos. El HTML llega con el contenido
             ya resuelto; no hay hidratación de tarjetas.
@@ -46,11 +53,13 @@ export default function InspeccionesCatalogoSSRPage() {
           </div>
         )}
 
+        <LocalInspections />
+
         {!loadError && hasData && (
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {catalog.map((item) => (
               <li key={item.id}>
-                <article className="h-full bg-slate-800 rounded-lg p-4 border border-slate-700 shadow-sm hover:border-slate-600 transition">
+                <article className="relative h-full bg-slate-800 rounded-lg p-4 border border-slate-700 shadow-sm hover:border-sky-500/60 transition">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-semibold px-2 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/20">
                       {item.statusLabel || item.status}
@@ -65,9 +74,9 @@ export default function InspeccionesCatalogoSSRPage() {
                     </span>
                     <Link
                       href={`/inspecciones/${item.id}`}
-                      className="text-sky-400 hover:text-sky-300 font-medium"
+                      className="text-sky-400 hover:text-sky-300 font-medium after:absolute after:inset-0 after:rounded-lg"
                     >
-                      Ver detalle CSR
+                      Ver detalle →
                     </Link>
                   </div>
                 </article>
