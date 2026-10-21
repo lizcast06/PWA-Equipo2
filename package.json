@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "node tests/starter.spec.mjs && node tests/manifest.spec.ts && node tests/service-worker.spec.ts && node tests/offline.spec.ts && node tests/rendering.spec.ts && node tests/sync.spec.ts && node tests/capabilities.spec.ts && node tests/ux.spec.ts",
+    "test": "npm run test:legacy && vitest run",
+    "test:legacy": "node tests/starter.spec.mjs && node tests/manifest.spec.ts && node tests/service-worker.spec.ts && node tests/offline.spec.ts && node tests/rendering.spec.ts && node tests/sync.spec.ts && node tests/capabilities.spec.ts && node tests/ux.spec.ts",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "test:e2e": "playwright test",
     "verify": "node scripts/verify.mjs"
   },
   "dependencies": {
@@ -15,12 +19,15 @@
     "react-dom": "18.3.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@types/node": "^20.14.15",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "autoprefixer": "^10.6.0",
+    "jsdom": "^29.1.1",
     "postcss": "^8.5.28",
     "tailwindcss": "^3.4.19",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "vitest": "^3.2.7"
   }
 }

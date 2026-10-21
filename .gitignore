@@ -8,5 +8,10 @@ coverage/
 reports/verification.json
 
 
+# Resultados de pruebas
+test-results/
+playwright-report/
+coverage/
+
 # TypeScript incremental
 tsconfig.tsbuildinfo
