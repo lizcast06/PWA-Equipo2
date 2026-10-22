@@ -6,7 +6,14 @@ export default defineConfig({
   test: {
     include: ["tests/unit/**/*.test.ts", "tests/integration/**/*.test.ts"],
     environment: "node",
-    reporters: ["default"],
+    reporters: ["default", "junit"],
+    outputFile: { junit: "test-results/vitest-junit.xml" },
     restoreMocks: true,
+    coverage: {
+      provider: "v8",
+      include: ["src/lib/**/*.ts"],
+      reporter: ["text", "html", "json-summary", "lcov"],
+      reportsDirectory: "coverage",
+    },
   },
 });

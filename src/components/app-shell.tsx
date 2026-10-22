@@ -66,6 +66,8 @@ export function AppShell({ children, activeRoute = "/", isSyncing = false }: App
       <header className="sticky top-0 z-50 bg-slate-800/90 backdrop-blur border-b border-slate-700 px-4 py-3" role="banner">
         <div className="max-w-5xl mx-auto flex items-center justify-between gap-3">
           <Link href="/" className="flex items-center space-x-3 min-w-0">
+            {/* Ícono precacheado por el Service Worker: <img> directo para que cargue sin conexión. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/icon-192.png" alt="" width={32} height={32} className="w-8 h-8 rounded-lg shadow" />
             <div className="min-w-0">
               <h1 className="text-sm font-semibold leading-none mb-1">Inspecciones UTT</h1>
