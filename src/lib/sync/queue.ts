@@ -23,6 +23,10 @@ export class SyncQueue {
     return this.queue.length;
   }
 
+  public getPendingItems(): SyncQueueItem[] {
+    return this.queue.map((item) => ({ ...item }));
+  }
+
   public async processQueue(
     remoteSyncFn: (item: SyncQueueItem) => Promise<boolean>
   ): Promise<{ processed: number; failed: number }> {

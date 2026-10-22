@@ -1,4 +1,7 @@
+import Link from "next/link";
 import { AppShell } from "../components/app-shell";
+import { InspectionCard } from "../components/inspection-card";
+import { LocalInspections } from "../components/local-inspections";
 import { inspections } from "../lib/data/inspections";
 
 export default function HomePage() {
@@ -7,17 +10,30 @@ export default function HomePage() {
   return (
     <AppShell activeRoute="/">
       <div className="space-y-6">
-        <div className="border-b border-slate-700 pb-4">
-          <h2 className="text-xl font-bold text-white tracking-tight">Inspecciones de laboratorio</h2>
-          <p className="text-sm text-slate-400">
-            Bitácora de mantenimiento preventivo. Los datos mostrados son sintéticos.
-          </p>
-          <p className="mt-3">
-            <a href="/inspecciones" className="text-sm text-sky-400 hover:text-sky-300 font-medium">
-              Abrir catálogo SSR de inspecciones
-            </a>
-          </p>
+        <div className="border-b border-slate-700 pb-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-bold text-white tracking-tight">Inspecciones de laboratorio</h2>
+            <p className="text-sm text-slate-400">
+              Bitácora de mantenimiento preventivo. Los datos mostrados son sintéticos.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Link
+              href="/inspecciones/nueva"
+              className="whitespace-nowrap inline-flex items-center justify-center px-4 py-2 rounded-lg bg-sky-600 hover:bg-sky-500 text-sm font-semibold text-white shadow"
+            >
+              + Nueva inspección
+            </Link>
+            <Link
+              href="/inspecciones"
+              className="whitespace-nowrap inline-flex items-center justify-center px-4 py-2 rounded-lg border border-slate-600 hover:bg-slate-800 text-sm font-medium text-slate-200"
+            >
+              Ver catálogo
+            </Link>
+          </div>
         </div>
+
+        <LocalInspections />
 
         {/* Estado Vacío (Empty State) */}
         {!hasData ? (
@@ -26,40 +42,15 @@ export default function HomePage() {
             <p className="text-xs text-slate-500 mt-1">Los registros completados en campo aparecerán aquí.</p>
           </div>
         ) : (
-          /* Estado Normal con Datos */
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {inspections.map((item) => (
-              <article key={item.id} className="bg-slate-800 rounded-lg p-4 border border-slate-700 shadow-sm hover:border-slate-600 transition">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-semibold px-2 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/20">
-                    {item.statusLabel || item.status}
-                  </span>
-                  <span className="text-xs text-slate-400">{item.date}</span>
-                </div>
-                <h3 className="text-sm font-semibold text-slate-100">{item.location}</h3>
-                <p className="text-xs text-slate-300 mt-1 line-clamp-2">{item.summary}</p>
-                <div className="mt-3 pt-3 border-t border-slate-700/60 flex justify-between text-xs text-slate-400">
-                  <span>Resp: <strong className="text-slate-200">{item.inspector}</strong></span>
-                  <span>Hallazgos: <strong className="text-slate-200">{item.findings}</strong></span>
-                </div>
-              </article>
-            ))}
-          </div>
-        )}
-
-        {/* Estado de Carga / Sincronización simulado */}
-        <section aria-label="Indicadores de estado del shell" className="pt-6">
-          <details className="bg-slate-800/40 rounded-lg border border-slate-700/60 p-3 text-xs text-slate-400">
-            <summary className="cursor-pointer font-medium text-slate-300">
-              Inspección de Estados de Ingeniería (Carga, Error, Vacío)
-            </summary>
-            <div className="mt-3 space-y-2 pt-2 border-t border-slate-700">
-              <p>• <strong>Estado de Carga:</strong> Controlado mediante indicador visual en cabecera del shell.</p>
-              <p>• <strong>Estado Vacío:</strong> Componente adaptativo renderizado ante colecciones vacías.</p>
-              <p>• <strong>Manejo de Errores:</strong> Fallback visual integrado para fallos de red en campo.</p>
+          <section aria-label="Inspecciones recientes" className="space-y-3">
+            <h3 className="text-sm font-semibold text-slate-200">Inspecciones recientes</h3>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {inspections.map((item) => (
+                <InspectionCard key={item.id} item={item} />
+              ))}
             </div>
-          </details>
-        </section>
+          </section>
+        )}
       </div>
     </AppShell>
   );

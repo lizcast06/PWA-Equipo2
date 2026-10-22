@@ -6,6 +6,9 @@ import { useParams } from "next/navigation";
 import { AppShell } from "../../../components/app-shell";
 import { LoadingState } from "../../../components/loading-state";
 import { inspections } from "../../../lib/data/inspections";
+import { SYNC_STATUS_LABELS } from "../../../components/local-inspections";
+import { getLocalInspection, LocalInspectionPayload, retryInspection, STORE_CHANGED_EVENT } from "../../../lib/storage/local-store";
+import { StoredInspection } from "../../../lib/storage/schema";
 
 interface InspectionDetail {
   id: string;
@@ -16,6 +19,26 @@ interface InspectionDetail {
   statusLabel?: string;
   findings: number;
   summary: string;
+  photo?: string;
+  coords?: LocalInspectionPayload["coords"];
+  syncStatus?: StoredInspection["status"];
+}
+
+function fromLocal(record: StoredInspection): InspectionDetail {
+  const payload = record.payload as unknown as LocalInspectionPayload;
+  return {
+    id: record.id,
+    location: record.location,
+    date: payload.date,
+    inspector: record.inspector,
+    status: record.findings > 0 ? "attention" : "ok",
+    statusLabel: record.findings > 0 ? "Requiere atención" : "Sin incidencias",
+    findings: record.findings,
+    summary: payload.summary,
+    photo: payload.photo,
+    coords: payload.coords,
+    syncStatus: record.status,
+  };
 }
 
 export default function InspeccionDetalleCSRPage() {
@@ -39,8 +62,11 @@ export default function InspeccionDetalleCSRPage() {
       }
 
       const match = inspections.find((item) => item.id.toLowerCase() === id.toLowerCase());
+      const local = match ? undefined : getLocalInspection(id);
       if (match) {
         setInspection(match);
+      } else if (local) {
+        setInspection(fromLocal(local));
       } else {
         setError(`No se encontró registro para la inspección con identificador: ${id}`);
       }
@@ -48,6 +74,17 @@ export default function InspeccionDetalleCSRPage() {
     }, 150);
 
     return () => clearTimeout(timer);
+  }, [id]);
+
+  // Refleja en pantalla cuando un registro local termina de enviarse.
+  useEffect(() => {
+    if (!id) return;
+    const refresh = () => {
+      const local = getLocalInspection(id);
+      if (local) setInspection(fromLocal(local));
+    };
+    window.addEventListener(STORE_CHANGED_EVENT, refresh);
+    return () => window.removeEventListener(STORE_CHANGED_EVENT, refresh);
   }, [id]);
 
   return (
@@ -58,7 +95,7 @@ export default function InspeccionDetalleCSRPage() {
             href="/inspecciones"
             className="text-xs text-sky-400 hover:text-sky-300 font-medium inline-flex items-center space-x-1"
           >
-            <span>&larr; Volver al catálogo SSR</span>
+            <span>&larr; Volver al catálogo</span>
           </Link>
         </nav>
 
@@ -69,15 +106,15 @@ export default function InspeccionDetalleCSRPage() {
             </span>
           </div>
           <h2 className="text-xl font-bold text-white tracking-tight mt-2">
-            Detalle Interactivo de Laboratorio
+            Detalle de la inspección
           </h2>
         </header>
 
         {/* Estado de Carga */}
         {isLoading && (
           <LoadingState
-            message="Hidratando y recuperando inspección..."
-            description="Recuperando estado de memoria cliente para el registro seleccionado"
+            message="Cargando inspección..."
+            description="Buscando el registro seleccionado"
           />
         )}
 
@@ -87,7 +124,7 @@ export default function InspeccionDetalleCSRPage() {
             role="alert"
             className="p-6 bg-red-950/40 rounded-xl border border-red-800 text-center space-y-3"
           >
-            <h3 className="text-sm font-semibold text-red-300">Error de Recuperación</h3>
+            <h3 className="text-sm font-semibold text-red-300">No encontramos esta inspección</h3>
             <p className="text-xs text-red-400">{error}</p>
             <Link
               href="/inspecciones"
@@ -106,10 +143,45 @@ export default function InspeccionDetalleCSRPage() {
                 <span className="text-xs font-mono text-sky-400">ID: {inspection.id}</span>
                 <h3 className="text-lg font-bold text-slate-100 mt-1">{inspection.location}</h3>
               </div>
-              <span className="px-2.5 py-1 rounded text-xs font-medium bg-sky-500/10 text-sky-400 border border-sky-500/20">
-                {inspection.statusLabel || inspection.status}
-              </span>
+              <div className="flex flex-col items-end gap-1.5">
+                <span
+                  className={`px-2.5 py-1 rounded text-xs font-medium border ${
+                    inspection.status === "attention"
+                      ? "bg-amber-500/15 text-amber-300 border-amber-500/30"
+                      : "bg-sky-500/10 text-sky-400 border-sky-500/20"
+                  }`}
+                >
+                  {inspection.statusLabel || inspection.status}
+                </span>
+                {inspection.syncStatus && (
+                  <span className={`px-2.5 py-1 rounded text-xs font-medium border ${SYNC_STATUS_LABELS[inspection.syncStatus].className}`}>
+                    {SYNC_STATUS_LABELS[inspection.syncStatus].label}
+                  </span>
+                )}
+              </div>
             </div>
+
+            {inspection.syncStatus === "conflicto" && (
+              <button
+                type="button"
+                onClick={() => {
+                  retryInspection(inspection.id);
+                  setInspection({ ...inspection, syncStatus: "pendiente_sync" });
+                }}
+                className="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-xs font-semibold text-white"
+              >
+                Reintentar envío
+              </button>
+            )}
+
+            {inspection.photo && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={inspection.photo}
+                alt={`Evidencia fotográfica de ${inspection.location}`}
+                className="w-full max-h-80 object-contain rounded-lg border border-slate-700 bg-slate-950"
+              />
+            )}
 
             <p className="text-sm text-slate-300 bg-slate-900/50 p-4 rounded-lg border border-slate-800">
               {inspection.summary}
@@ -124,6 +196,19 @@ export default function InspeccionDetalleCSRPage() {
                 <dt className="text-slate-400">Fecha de Registro:</dt>
                 <dd className="font-semibold text-slate-200 mt-0.5">{inspection.date}</dd>
               </div>
+              <div className="bg-slate-900/30 p-3 rounded border border-slate-800">
+                <dt className="text-slate-400">Hallazgos:</dt>
+                <dd className="font-semibold text-slate-200 mt-0.5">{inspection.findings}</dd>
+              </div>
+              {inspection.coords && (
+                <div className="bg-slate-900/30 p-3 rounded border border-slate-800">
+                  <dt className="text-slate-400">Ubicación:</dt>
+                  <dd className="font-semibold text-slate-200 mt-0.5">
+                    {inspection.coords.latitude.toFixed(4)}, {inspection.coords.longitude.toFixed(4)}
+                    {inspection.coords.synthetic && <span className="block font-normal text-slate-400">(aproximada del campus)</span>}
+                  </dd>
+                </div>
+              )}
             </dl>
           </article>
         )}

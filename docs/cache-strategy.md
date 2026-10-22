@@ -16,3 +16,8 @@
 - **Install:** Abre la caché estática y precachea las rutas críticas declaradas. `self.skipWaiting()` fuerza la activación.
 - **Activate:** Limpia cachés de versiones obsoletas comparando contra `CURRENT_CACHES` y toma control inmediato con `clients.claim()`.
 - **Fetch:** Intercepta peticiones del mismo origen aplicando el enrutador de estrategias seguro sin bloquear llamadas externas.
+## 4. Ajustes posteriores (`static-v2` / `runtime-v2`)
+- **Precache ampliado:** además de `/` y el manifest, se precachean los íconos (`/icon-192.png`, `/icon-512.png`) y las pantallas `/inspecciones`, `/inspecciones/nueva`, `/pendientes` y `/ajustes` para que abran sin conexión aunque no se hayan visitado. Las rutas se agregan de forma individual para que una falla no cancele la instalación.
+- **JS/CSS pasan a Network-First con fallback a caché:** en `next dev` los archivos de `/_next/static` no llevan hash, por lo que Cache-First servía código viejo después de cada cambio. Con Network-First siempre se usa la versión actual cuando hay red y la copia en caché cuando no la hay.
+- **Manifest e íconos:** Cache-First, ya que no cambian entre versiones.
+- **Indicador real en la interfaz:** la etiqueta del encabezado refleja si el Service Worker controla la página ("Listo sin conexión"), si no está activo ("En línea · sin caché offline") o si el navegador perdió la red ("Sin conexión").
