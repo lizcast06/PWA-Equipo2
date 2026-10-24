@@ -9,6 +9,7 @@ import { createFileInputFallback, requestCameraStream } from "../../../lib/devic
 import { GeolocationResolution, obtainLocation } from "../../../lib/device/geolocation";
 import { saveNewInspection } from "../../../lib/storage/local-store";
 import { showToast } from "../../../lib/pwa/toast";
+import { InspectionFormErrors, validateInspectionInput } from "../../../lib/validation/inspection";
 
 const KNOWN_LABS = Array.from(new Set(inspections.map((item) => item.location)));
 const OTHER_LAB = "__otro__";
@@ -33,12 +34,7 @@ function downscaleDataUrl(dataUrl: string): Promise<string> {
   });
 }
 
-interface FormErrors {
-  location?: string;
-  inspector?: string;
-  summary?: string;
-  findings?: string;
-}
+type FormErrors = InspectionFormErrors;
 
 export default function NuevaInspeccionPage() {
   const router = useRouter();
@@ -94,16 +90,13 @@ export default function NuevaInspeccionPage() {
     setLocating(false);
   };
 
-  const validate = (): FormErrors => {
-    const next: FormErrors = {};
-    const location = lab === OTHER_LAB ? otherLab.trim() : lab;
-    if (!location) next.location = "Indica el laboratorio inspeccionado.";
-    if (inspector.trim().length < 2) next.inspector = "Escribe el nombre de quien inspecciona.";
-    if (summary.trim().length < 10) next.summary = "Describe la inspección (mínimo 10 caracteres).";
-    const count = Number(findings);
-    if (!Number.isInteger(count) || count < 0 || count > 99) next.findings = "Usa un número entero entre 0 y 99.";
-    return next;
-  };
+  const validate = (): FormErrors =>
+    validateInspectionInput({
+      location: lab === OTHER_LAB ? otherLab : lab,
+      inspector,
+      findings,
+      summary,
+    });
 
   // Tras el primer intento de envío, los errores se actualizan mientras se corrige.
   useEffect(() => {

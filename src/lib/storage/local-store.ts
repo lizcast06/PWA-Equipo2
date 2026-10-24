@@ -126,7 +126,10 @@ export interface SyncSummary {
   skipped: boolean;
 }
 
-export function syncPendingInspections(): Promise<SyncSummary> {
+export type RemoteSync = (item: SyncQueueItem) => Promise<boolean>;
+
+// `remote` es opcional: la app usa el servidor simulado y las pruebas inyectan un fixture.
+export function syncPendingInspections(remote: RemoteSync = simulatedRemoteSync): Promise<SyncSummary> {
   if (syncInFlight) return syncInFlight;
 
   syncInFlight = (async () => {
@@ -137,14 +140,19 @@ export function syncPendingInspections(): Promise<SyncSummary> {
 
     const queue = new SyncQueue();
     pendingBefore.forEach((item) => queue.enqueue(item));
-    const { processed, failed } = await queue.processQueue(simulatedRemoteSync);
+    // Se anota lo que el remoto aceptó en esta corrida (sea el simulado o uno inyectado).
+    const delivered = new Set<string>();
+    const { processed, failed } = await queue.processQueue(async (item) => {
+      const accepted = await remote(item);
+      if (accepted) delivered.add(item.entityId);
+      return accepted;
+    });
     const remaining = queue.getPendingItems();
     const remainingIds = new Set(remaining.map((item) => item.entityId));
     const failedIds = new Set(
       pendingBefore
-        .filter((item) => !remainingIds.has(item.entityId))
+        .filter((item) => !remainingIds.has(item.entityId) && !delivered.has(item.entityId))
         .map((item) => item.entityId)
-        .filter((id) => !read<Record<string, unknown>>(KEYS.remote, {})[id])
     );
 
     const updated = read<StoredInspection[]>(KEYS.inspections, []).map((record) => {
