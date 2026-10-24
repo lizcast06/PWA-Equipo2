@@ -5,7 +5,8 @@ const PORT = Number(process.env.E2E_PORT ?? 3100);
 // E2E del flujo crítico contra el build de producción (next start).
 export default defineConfig({
   testDir: "tests/e2e",
-  outputDir: "test-results",
+  // Subcarpeta propia: Playwright vacía su outputDir al iniciar y borraría el JUnit de Vitest.
+  outputDir: "test-results/e2e",
   fullyParallel: false,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [["list"], ["html", { open: "never", outputFolder: "playwright-report" }]] : "list",

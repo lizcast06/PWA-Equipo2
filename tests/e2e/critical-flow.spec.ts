@@ -30,5 +30,4 @@ test("el manifest es accesible para instalar la PWA", async ({ request }) => {
   expect((await response.json()).display).toBe("standalone");
 });
 
-// TODO(Emmanuel): agregar el escenario offline (context.setOffline(true)) después de
-// que el Service Worker controle la página, y verificar que "/" sigue cargando.
+// El escenario sin conexión vive en offline-flow.spec.ts y las capacidades denegadas en device-denied.spec.ts.
