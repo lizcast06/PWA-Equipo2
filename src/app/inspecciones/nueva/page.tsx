@@ -9,6 +9,7 @@ import { createFileInputFallback, requestCameraStream } from "../../../lib/devic
 import { GeolocationResolution, obtainLocation } from "../../../lib/device/geolocation";
 import { saveNewInspection } from "../../../lib/storage/local-store";
 import { showToast } from "../../../lib/pwa/toast";
+import { inspectionDetailHref } from "../../../lib/routes";
 import { InspectionFormErrors, validateInspectionInput } from "../../../lib/validation/inspection";
 
 const KNOWN_LABS = Array.from(new Set(inspections.map((item) => item.location)));
@@ -130,7 +131,7 @@ export default function NuevaInspeccionPage() {
           : "Sin conexión: la inspección quedó guardada en este dispositivo y se enviará al volver la señal.",
         navigator.onLine ? "success" : "warning"
       );
-      router.push(`/inspecciones/${record.id}`);
+      router.push(inspectionDetailHref(record.id));
     } catch {
       setSaving(false);
       showToast("No hay espacio suficiente en el dispositivo. Quita la foto o libera datos en Ajustes.", "error");

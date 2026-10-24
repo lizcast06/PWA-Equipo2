@@ -21,3 +21,8 @@
 - **JS/CSS pasan a Network-First con fallback a caché:** en `next dev` los archivos de `/_next/static` no llevan hash, por lo que Cache-First servía código viejo después de cada cambio. Con Network-First siempre se usa la versión actual cuando hay red y la copia en caché cuando no la hay.
 - **Manifest e íconos:** Cache-First, ya que no cambian entre versiones.
 - **Indicador real en la interfaz:** la etiqueta del encabezado refleja si el Service Worker controla la página ("Listo sin conexión"), si no está activo ("En línea · sin caché offline") o si el navegador perdió la red ("Sin conexión").
+
+## 5. Versión `static-v3` / `runtime-v3` (semana 8, hallazgo D10)
+- **Detalle sin conexión:** las inspecciones creadas en el dispositivo se abren en `/inspecciones/ver?id=<id>`, una página estática; la navegación sin red usa `ignoreSearch`, así una sola copia sirve para cualquier id. Los detalles de las tres inspecciones sembradas también se precachean.
+- **JavaScript de cada pantalla:** al instalarse, el Service Worker descarga el HTML de cada ruta y guarda los archivos `/_next/static/...` que referencia, para que una pantalla nunca abierta con red sea interactiva sin conexión.
+- Cubierto por `tests/e2e/offline-screens.spec.ts` (ver `docs/test-strategy.md`, D10 y E9).
