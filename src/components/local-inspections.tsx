@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { StoredInspection } from "../lib/storage/schema";
 import { getLocalInspections, LocalInspectionPayload, STORE_CHANGED_EVENT } from "../lib/storage/local-store";
+import { inspectionDetailHref } from "../lib/routes";
 
 export const SYNC_STATUS_LABELS: Record<StoredInspection["status"], { label: string; className: string }> = {
   borrador: { label: "Borrador", className: "bg-slate-600/30 text-slate-300 border-slate-500/40" },
@@ -46,7 +47,7 @@ export function LocalInspections({ title = "Registradas en este dispositivo" }: 
                   <span className="text-xs text-slate-400">{payload.date}</span>
                 </div>
                 <h4 className="text-sm font-semibold text-slate-100">
-                  <Link href={`/inspecciones/${item.id}`} className="after:absolute after:inset-0 after:rounded-lg focus:outline-none">
+                  <Link href={inspectionDetailHref(item.id)} className="after:absolute after:inset-0 after:rounded-lg focus:outline-none">
                     {item.location}
                   </Link>
                 </h4>

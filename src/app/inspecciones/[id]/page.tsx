@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { AppShell } from "../../../components/app-shell";
 import { LoadingState } from "../../../components/loading-state";
 import { inspections } from "../../../lib/data/inspections";
@@ -43,7 +43,11 @@ function fromLocal(record: StoredInspection): InspectionDetail {
 
 export default function InspeccionDetalleCSRPage() {
   const params = useParams();
-  const id = Array.isArray(params?.id) ? params.id[0] : (params?.id as string);
+  const searchParams = useSearchParams();
+  // El id llega por la ruta (/inspecciones/<id>) o, en la vista que funciona sin conexión,
+  // por la consulta (/inspecciones/ver?id=<id>).
+  const routeId = Array.isArray(params?.id) ? params.id[0] : (params?.id as string | undefined);
+  const id = routeId ?? searchParams?.get("id") ?? "";
 
   const [inspection, setInspection] = useState<InspectionDetail | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);

@@ -32,9 +32,12 @@ test("crear sin conexión, recargar y sincronizar al reconectar sin duplicados",
   await page.getByLabel("Hallazgos").fill("1");
   await page.getByLabel("Descripción").fill(SUMMARY);
   await page.getByRole("button", { name: "Guardar inspección" }).click();
-  // Al guardar, la app redirige al detalle; se espera para no competir con esa navegación.
-  await page.waitForURL(/\/inspecciones\/local-/);
-  await page.waitForLoadState("load");
+  // Al guardar, la app abre el detalle (vista que funciona sin red); se espera para no competir
+  // con esa navegación y se comprueba que es el detalle real y no otra pantalla.
+  await page.waitForURL(/\/inspecciones\/ver\?id=local-/);
+  await expect(page.getByRole("heading", { name: "Detalle de la inspección" })).toBeVisible();
+  await expect(page.getByText(SUMMARY)).toBeVisible();
+  await expect(page.getByText("Pendiente de envío")).toBeVisible();
 
   await page.goto("/pendientes");
   await expect(page.getByText("Pendiente de envío")).toBeVisible();

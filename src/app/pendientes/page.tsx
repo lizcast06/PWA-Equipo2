@@ -6,6 +6,7 @@ import { AppShell } from "../../components/app-shell";
 import { SYNC_STATUS_LABELS, useLocalInspections } from "../../components/local-inspections";
 import { LoadingState } from "../../components/loading-state";
 import { useAppStatus } from "../../lib/pwa/use-app-status";
+import { inspectionDetailHref } from "../../lib/routes";
 import { showToast } from "../../lib/pwa/toast";
 import { LocalInspectionPayload, retryInspection, syncPendingInspections } from "../../lib/storage/local-store";
 
@@ -74,7 +75,7 @@ export default function PendientesPage() {
                       <span className={`text-xs font-semibold px-2 py-0.5 rounded border ${status.className}`}>{status.label}</span>
                       <span className="text-xs text-slate-400">{payload.date}</span>
                     </div>
-                    <Link href={`/inspecciones/${item.id}`} className="block mt-1 text-sm font-semibold text-slate-100 hover:text-sky-300 truncate">
+                    <Link href={inspectionDetailHref(item.id)} className="block mt-1 text-sm font-semibold text-slate-100 hover:text-sky-300 truncate">
                       {item.location}
                     </Link>
                     <p className="text-xs text-slate-400 truncate">{payload.summary}</p>
@@ -100,7 +101,7 @@ export default function PendientesPage() {
             <ul className="divide-y divide-slate-800 rounded-lg border border-slate-800">
               {sent.slice(0, 10).map((item) => (
                 <li key={item.id} className="px-4 py-2 flex justify-between text-xs">
-                  <Link href={`/inspecciones/${item.id}`} className="text-slate-200 hover:text-sky-300 truncate">
+                  <Link href={inspectionDetailHref(item.id)} className="text-slate-200 hover:text-sky-300 truncate">
                     {item.location}
                   </Link>
                   <span className="text-emerald-300 shrink-0 ml-3">Enviada</span>
