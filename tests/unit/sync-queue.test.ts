@@ -43,5 +43,40 @@ describe("SyncQueue", () => {
     expect(queue.getPendingCount()).toBe(0);
   });
 
-  // TODO(Abraham): agregar casos para respuesta `false` del remoto y mezcla de éxitos/fallos.
+  it("si el remoto responde false el elemento sigue pendiente y suma un reintento", async () => {
+    const queue = new SyncQueue();
+    queue.enqueue(makeQueueItem({ mutationId: "rechazada" }));
+
+    const result = await queue.processQueue(vi.fn().mockResolvedValue(false));
+
+    expect(result).toEqual({ processed: 0, failed: 0 });
+    expect(queue.getPendingItems()).toMatchObject([{ mutationId: "rechazada", retryCount: 1 }]);
+  });
+
+  it("con éxitos y fallos mezclados solo quedan pendientes los que fallaron", async () => {
+    const queue = new SyncQueue();
+    queue.enqueue(makeQueueItem({ mutationId: "ok-1", entityId: "e-1" }));
+    queue.enqueue(makeQueueItem({ mutationId: "falla", entityId: "e-2" }));
+    queue.enqueue(makeQueueItem({ mutationId: "ok-2", entityId: "e-3" }));
+    const remote = vi.fn(async (item: { mutationId: string }) => item.mutationId !== "falla");
+
+    const result = await queue.processQueue(remote);
+
+    expect(result).toEqual({ processed: 2, failed: 0 });
+    expect(queue.getPendingItems().map((item) => item.mutationId)).toEqual(["falla"]);
+    // Al reintentar solo se vuelve a enviar el que falló, no los que ya llegaron.
+    await queue.processQueue(vi.fn().mockResolvedValue(true));
+    expect(queue.getPendingCount()).toBe(0);
+  });
+
+  it("getPendingItems devuelve copias: modificarlas no altera la cola", () => {
+    const queue = new SyncQueue();
+    queue.enqueue(makeQueueItem({ mutationId: "a" }));
+
+    const [copy] = queue.getPendingItems();
+    copy.retryCount = 99;
+    copy.mutationId = "otra";
+
+    expect(queue.getPendingItems()).toMatchObject([{ mutationId: "a", retryCount: 0 }]);
+  });
 });
