@@ -7,9 +7,16 @@ export class SyncQueue {
   private maxRetries: number = 3;
 
   public enqueue(item: SyncQueueItem): boolean {
-    // DEFECTO CONTROLADO (semana 8): se omite la protección de duplicados. NO FUSIONAR.
-    this.queue.push({ ...item });
-    return true;
+    // Idempotencia: evitar duplicados en la cola
+    if (this.processedMutationIds.has(item.mutationId)) {
+      return false;
+    }
+    const exists = this.queue.some((q) => q.mutationId === item.mutationId);
+    if (!exists) {
+      this.queue.push({ ...item });
+      return true;
+    }
+    return false;
   }
 
   public getPendingCount(): number {
