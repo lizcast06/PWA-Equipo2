@@ -73,7 +73,7 @@ Node 22 y npm 10. Desde la raíz del repositorio:
 | E2E | `npx playwright install chromium` (una vez) y `npm run test:e2e` | Playwright contra el build de producción |
 | Todo | `make verify` | lint → tipos → build → pruebas; se detiene en la primera etapa que falla |
 
-**Servidor usado por E2E** (`playwright.config.ts`): Playwright arranca `npm run build && npx next start -p 3100` y espera a que responda `http://localhost:3100`. En CI, con `E2E_SKIP_BUILD=1`, solo ejecuta `npx next start -p 3100` porque el build ya se hizo en la etapa anterior. Reporte HTML en `playwright-report/` y trazas de fallos en `test-results/`.
+**Servidor usado por E2E** (`playwright.config.ts`): Playwright arranca `npm run build && npx next start -p 3100` y espera a que responda `http://localhost:3100`. En CI, con `E2E_SKIP_BUILD=1`, solo ejecuta `npx next start -p 3100` porque el build ya se hizo en la etapa anterior. Reporte HTML en `playwright-report/` y trazas de fallos en `test-results/e2e/` (subcarpeta propia para no borrar `test-results/vitest-junit.xml`, ya que Playwright vacía su carpeta de salida al iniciar).
 
 **CI:** `.github/workflows/academic-evaluation.yml` (PR #12). Etapas: instalación limpia → lint → tipos → build → suites heredadas → unit + integración con cobertura → navegador E2E → E2E → subida de `coverage/`, `test-results/` y `playwright-report/` con `if: always()`. Cada etapa corta el job si falla. La ejecución del SHA final se registra en la entrega de Classroom.
 

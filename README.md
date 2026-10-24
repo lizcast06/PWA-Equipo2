@@ -6,7 +6,7 @@ Este repositorio es el punto de partida común para las actividades de las seman
 
 ## Requisitos locales
 
-- Node.js 20 LTS o superior compatible con Next.js.
+- Node.js 22 (la misma versión que usa el CI).
 - npm 10 o superior.
 - Git y una cuenta de GitHub.
 
@@ -32,7 +32,7 @@ make verify
 bash public-tests/check.sh
 ```
 
-`make verify` genera `reports/verification.json`; ese archivo y la corrida verde de GitHub Actions son la evidencia técnica del arranque.
+`make verify` ejecuta lint, tipos, build y pruebas (se detiene en la primera etapa que falle) y al final genera `reports/verification.json`; ese archivo y la corrida verde de GitHub Actions son la evidencia técnica del arranque.
 
 ## Flujo de trabajo del curso
 
@@ -72,17 +72,31 @@ Las decisiones de arquitectura y las nuevas carpetas se incorporan en las activi
 | `npm run lint` | Valida reglas de código estáticas mediante ESLint |
 | `npm run typecheck` | Comprueba la validez de tipos de TypeScript con `tsc --noEmit` |
 | `npm run build` | Compila la aplicación Next.js para producción |
+| `npm test` | Suites heredadas (semanas 01–06) + unitarias + integración |
 | `npm run test:legacy` | Ejecuta las pruebas públicas y validaciones de Semanas 01 a 06 |
-| `npm run test:coverage` | Pruebas unitarias e integración con generación de reporte en `coverage/` |
+| `npm run test:unit` | Solo pruebas unitarias (`tests/unit/`, Vitest) |
+| `npm run test:integration` | Solo pruebas de integración (`tests/integration/`, Vitest) |
+| `npm run test:coverage` | Unitarias + integración con cobertura en `coverage/` y reporte JUnit en `test-results/vitest-junit.xml` |
+| `npx playwright install chromium` | Descarga una sola vez el navegador para E2E |
 | `npm run test:e2e` | Pruebas End-to-End con Playwright contra el servidor de producción en puerto 3100 |
+| `make verify` | `lint` → `typecheck` → `build` → `npm test` → `npm run verify`; falla si falla cualquier etapa |
 
-> **Nota para Windows:** El equivalente a la verificación completa es ejecutar en orden:
+> **Nota para Windows (sin `make`):** El equivalente a la verificación completa es ejecutar en orden:
 > `npm run lint && npm run typecheck && npm run build && npm run test:legacy && npm run test:coverage && npm run test:e2e`
 
 ### Servidor de Pruebas E2E
 El entorno E2E utiliza `playwright.config.ts` configurado para iniciar `next start` en el puerto `3100`. En entornos CI se utiliza la variable `E2E_SKIP_BUILD=1` para omitir la fase de recompilación y reutilizar el build previo.
 
-### Enlaces de CI (Workflow `.github/workflows/academic-evaluation.yml`)
+### CI y artefactos
+* **Workflow de la semana 8:** `.github/workflows/academic-evaluation.yml` (job `verify`). Ejecuta en orden: `npm ci` → lint → tipos → build → suites heredadas → unit + integración con cobertura → instalación de Chromium → E2E. Cualquier etapa que falle hace fallar el job. El detalle de cada etapa está en `docs/test-strategy.md` §4.
+* **Artefacto:** cada ejecución publica `reportes-w08-<sha>` en la pestaña *Actions*, **también cuando una prueba falla** (`if: always()`), con:
+  * `coverage/`: reporte de cobertura (abrir `coverage/index.html`).
+  * `test-results/vitest-junit.xml`: resultados de unit + integración.
+  * `test-results/e2e/`: trazas de Playwright de las pruebas que fallen.
+  * `playwright-report/`: reporte HTML de E2E.
+* **Workflows anteriores:** los archivos `week-0X-*.yml` se conservan como retroalimentación de las semanas 1–6; el de la semana 8 es `academic-evaluation.yml`.
+
+### Enlaces de CI
 * **Ejecución con fallo validado (Rojo):** [defecto controlado `de080fc`](https://github.com/lizcast06/PWA-Equipo2/actions/runs/40061332791) — falla la etapa "Unit + integración" y aun así se suben los reportes.
 * **Ejecución de la corrección (Verde):** [revert `cec607b`](https://github.com/lizcast06/PWA-Equipo2/actions/runs/40061487918) — todas las etapas, incluido E2E, en verde.
 * **Versión final en `main`:** el SHA final y su ejecución de Actions se registran en la entrega de Classroom (detalle en `docs/test-strategy.md`, §6).
