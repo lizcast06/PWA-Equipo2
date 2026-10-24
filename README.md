@@ -54,3 +54,41 @@ No uses datos reales de personas, laboratorios o estudiantes. Todo dato del star
 
 Las decisiones de arquitectura y las nuevas carpetas se incorporan en las actividades correspondientes; no es necesario adelantarlas.
 
+
+## Semana 08 · Verificación
+
+### Entorno y Requisitos
+* **Node.js:** v22.x
+* **npm:** v10.x o superior
+
+### Instalación y Ejecución Local
+* **Instalación limpia:** `npm ci`
+* **Servidor de desarrollo:** `npm run dev`
+* **Compilación de producción:** `npm run build && npm start`
+
+### Tabla de Comandos de Verificación
+| Comando | Descripción |
+| :--- | :--- |
+| `npm run lint` | Valida reglas de código estáticas mediante ESLint |
+| `npm run typecheck` | Comprueba la validez de tipos de TypeScript con `tsc --noEmit` |
+| `npm run build` | Compila la aplicación Next.js para producción |
+| `npm run test:legacy` | Ejecuta las pruebas públicas y validaciones de Semanas 01 a 06 |
+| `npm run test:coverage` | Pruebas unitarias e integración con generación de reporte en `coverage/` |
+| `npm run test:e2e` | Pruebas End-to-End con Playwright contra el servidor de producción en puerto 3100 |
+
+> **Nota para Windows:** El equivalente a la verificación completa es ejecutar en orden:
+> `npm run lint && npm run typecheck && npm run build && npm run test:legacy && npm run test:coverage && npm run test:e2e`
+
+### Servidor de Pruebas E2E
+El entorno E2E utiliza `playwright.config.ts` configurado para iniciar `next start` en el puerto `3100`. En entornos CI se utiliza la variable `E2E_SKIP_BUILD=1` para omitir la fase de recompilación y reutilizar el build previo.
+
+### Enlaces de CI (Workflow `.github/workflows/academic-evaluation.yml`)
+* **Ejecución con fallo validado (Rojo):** [Ver ejecución con fallo](PEGA_AQUI_TU_ENLACE_ROJO)
+* **Última ejecución exitosa en main (Verde):** [Ver ejecución exitosa](PEGA_AQUI_TU_ENLACE_VERDE)
+
+### Estructura y Correspondencia de Carpetas
+* Pruebas Unitarias: `tests/unit/`
+* Pruebas de Integración: `tests/integration/`
+* Pruebas End-to-End: `tests/e2e/`
+* Estrategia de Pruebas: `docs/test-strategy.md`
+* Pipeline de CI: `.github/workflows/academic-evaluation.yml`
