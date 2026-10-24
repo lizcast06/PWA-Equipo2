@@ -42,7 +42,7 @@ describe("flujo de sincronización offline → online", () => {
     expect(queue.reconcileRecord(local, remote).findings).toBe(2);
   });
 
-  // TODO(Abraham): integrar geolocalización y notificaciones con jsdom
-  // (agregar `// @vitest-environment jsdom` al inicio de un archivo nuevo y simular
-  // navigator.geolocation / Notification para cubrir los fallbacks).
+  // Persistencia offline y reintentos con localStorage real: offline-persistence.test.ts.
+  // Cámara, ubicación y notificaciones se cubren en E2E (device-denied.spec.ts); el hueco
+  // de integración con jsdom está registrado en docs/test-strategy.md §8.
 });
