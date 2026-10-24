@@ -55,5 +55,3 @@ export default function HomePage() {
     </AppShell>
   );
 }
-
-const errorIntencionalParaCI = true;
