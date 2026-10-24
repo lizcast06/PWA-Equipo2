@@ -75,7 +75,7 @@ Node 22 y npm 10. Desde la raíz del repositorio:
 
 **Servidor usado por E2E** (`playwright.config.ts`): Playwright arranca `npm run build && npx next start -p 3100` y espera a que responda `http://localhost:3100`. En CI, con `E2E_SKIP_BUILD=1`, solo ejecuta `npx next start -p 3100` porque el build ya se hizo en la etapa anterior. Reporte HTML en `playwright-report/` y trazas de fallos en `test-results/`.
 
-**CI:** `.github/workflows/academic-evaluation.yml` *(pendiente, PR de Dana)*. Ejecución de la versión final: *(enlace pendiente)*.
+**CI:** `.github/workflows/academic-evaluation.yml` (PR #12). Etapas: instalación limpia → lint → tipos → build → suites heredadas → unit + integración con cobertura → navegador E2E → E2E → subida de `coverage/`, `test-results/` y `playwright-report/` con `if: always()`. Cada etapa corta el job si falla. La ejecución del SHA final se registra en la entrega de Classroom.
 
 ---
 
@@ -119,8 +119,11 @@ Tras restaurar el código: `Tests 10 passed (10)`.
 
 **Evidencia en CI:**
 - Rama temporal: `defecto/w08-sin-idempotencia` (no se fusiona).
-- Ejecución con el defecto (roja): *(enlace pendiente)*
-- Ejecución con la corrección (verde): *(enlace pendiente)*
+- Ejecución con el defecto, commit `de080fc` (**roja**): https://github.com/lizcast06/PWA-Equipo2/actions/runs/40061332791
+  Lint, tipos, build y suites heredadas pasan; **falla "Unit + integración con cobertura"**; E2E se omite; **"Reportes y cobertura" se sube igual** (`if: always()`).
+- Ejecución con la corrección, commit `cec607b` = `git revert` del defecto (**verde**): https://github.com/lizcast06/PWA-Equipo2/actions/runs/40061487918
+  Todas las etapas en verde, incluido E2E.
+- La rama nunca se abrió como PR ni se integró a `main`.
 
 ---
 

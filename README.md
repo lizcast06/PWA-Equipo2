@@ -83,8 +83,9 @@ Las decisiones de arquitectura y las nuevas carpetas se incorporan en las activi
 El entorno E2E utiliza `playwright.config.ts` configurado para iniciar `next start` en el puerto `3100`. En entornos CI se utiliza la variable `E2E_SKIP_BUILD=1` para omitir la fase de recompilación y reutilizar el build previo.
 
 ### Enlaces de CI (Workflow `.github/workflows/academic-evaluation.yml`)
-* **Ejecución con fallo validado (Rojo):** [Ver ejecución con fallo](PEGA_AQUI_TU_ENLACE_ROJO)
-* **Última ejecución exitosa en main (Verde):** [Ver ejecución exitosa](PEGA_AQUI_TU_ENLACE_VERDE)
+* **Ejecución con fallo validado (Rojo):** [defecto controlado `de080fc`](https://github.com/lizcast06/PWA-Equipo2/actions/runs/40061332791) — falla la etapa "Unit + integración" y aun así se suben los reportes.
+* **Ejecución de la corrección (Verde):** [revert `cec607b`](https://github.com/lizcast06/PWA-Equipo2/actions/runs/40061487918) — todas las etapas, incluido E2E, en verde.
+* **Versión final en `main`:** el SHA final y su ejecución de Actions se registran en la entrega de Classroom (detalle en `docs/test-strategy.md`, §6).
 
 ### Estructura y Correspondencia de Carpetas
 * Pruebas Unitarias: `tests/unit/`
