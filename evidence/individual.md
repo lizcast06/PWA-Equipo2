@@ -35,7 +35,16 @@ El SHA final común se entrega en Classroom tras el último commit.
 - **Limitación o riesgo:** al escribir la integración encontré que `syncPendingInspections` marcaba como "conflicto" envíos correctos cuando el remoto no era el simulado (hallazgo D9), y lo corregí. Además, con el defecto oficial de la rama (quitar solo la protección de `enqueue`) mi prueba de integración sigue en verde, porque `processQueue` tiene una segunda protección. Ese defecto lo detectan las unitarias.
 - **IA: herramienta, propósito, partes influidas y validación propia:** usé Claude Code (Anthropic) para escribir la función de validación, las pruebas unitarias y de integración y su parte de `docs/test-strategy.md`; influyó en todo el código del PR #14. Lo validé corriendo los comandos de arriba, ensayando el defecto para ver que las pruebas fallan y leyendo cada prueba para poder explicarla.
 
-<!-- Dana Lizbeth y Abraham: agreguen aquí su bloque "## Nombre: ..." con la plantilla de la semana 8, cada quien en su propio commit. -->
+## Nombre: Dana Lizbeth Castañeda Sánchez
+
+- **Grupo y equipo:** 10A · Equipo Dana Lizbeth Castañeda Sánchez, Abraham Cervantes Romero y Emmanuel Castro Salvador.
+- **Mi contribución de esta semana y enlace:** Creación del workflow de CI en GitHub Actions (`.github/workflows/academic-evaluation.yml`), configuración de la subida de artefactos y actualización de la sección de verificación en el `README.md`. Enlace a mi PR #12: https://github.com/lizcast06/PWA-Equipo2/pull/12
+- **Decisión técnica y motivo:** Se estructuró el pipeline en 8 etapas jerárquicas con Node 22 para automatizar desde el lint y comprobación de tipos hasta las pruebas E2E con Playwright. Se incluyó `if: always()` en la etapa de subida de artefactos para garantizar la preservación de reportes de cobertura y errores ante cualquier falla.
+- **Prueba/comando que ejecuté:** `npm run lint && npm run typecheck && npm run build && npm run test:coverage && npm run test:e2e`
+- **Resultado observado y enlace al reporte:** Pipeline ejecutado en CI. Corrida verde de mi PR: https://github.com/lizcast06/PWA-Equipo2/actions/runs/40058150467 . Demostración de fallo controlado (rojo): https://github.com/lizcast06/PWA-Equipo2/actions/runs/40061332791 y su posterior recuperación en verde: https://github.com/lizcast06/PWA-Equipo2/actions/runs/40061487918
+- **Qué demuestra y qué no demuestra:** Demuestra que el código cumple con los estándares estáticos, compila correctamente y supera las pruebas unitarias, de integración y E2E dentro del runner de GitHub. No demuestra el comportamiento de la PWA en un entorno de despliegue real en producción ni bajo concurrencia.
+- **Limitación o riesgo:** En el primer intento de prueba de fallo, una variable no utilizada no detuvo el paso de lint debido a la configuración por defecto de Next.js. Además, la ejecución de Playwright en CI añade tiempo extra de construcción al instalar los binarios de Chromium.
+- **IA: herramienta, propósito, partes influidas y validación propia:** Gemini (Google). Se utilizó para estructurar el YAML del flujo de GitHub Actions, redactar la explicación técnica de las etapas y formatear la sección del README.md. Se validó ejecutando las tareas `npm` localmente y verificando las corridas en el panel de Actions.
 
 ---
 # Semana 6: Capacidades del dispositivo y notificaciones
