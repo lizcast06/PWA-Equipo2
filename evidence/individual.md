@@ -1,6 +1,30 @@
 # Evidencia individual del proyecto
 
 ---
+# Semana 8: Probar la PWA completa y automatizar la verificación
+
+Equipo 10A: Dana Lizbeth Castañeda Sánchez · Abraham Cervantes Romero · Emmanuel Castro Salvador.
+El SHA final común se entrega en Classroom tras el último commit.
+
+## Nombre: Emmanuel Castro Salvador
+
+- **Grupo y equipo:** 10A · Equipo Dana Lizbeth Castañeda Sánchez, Abraham Cervantes Romero y Emmanuel Castro Salvador (líder).
+- **Mi contribución de esta semana y enlace:**
+  - Diagnóstico de la versión de la semana 6 y conexión de captura, guardado offline, Pendientes y Ajustes a la interfaz para que el flujo pudiera probarse: [PR #10](https://github.com/lizcast06/PWA-Equipo2/pull/10).
+  - Base de la pirámide (Vitest, Playwright, lint, `typecheck`, cobertura, `make verify`): [PR #11](https://github.com/lizcast06/PWA-Equipo2/pull/11).
+  - E2E `tests/e2e/offline-flow.spec.ts` y `tests/e2e/device-denied.spec.ts`, `docs/test-strategy.md` y defecto controlado: [PR #13](https://github.com/lizcast06/PWA-Equipo2/pull/13).
+  - Auditoría con aserciones estrictas que encontró el hallazgo D10 (sin conexión el detalle mostraba el inicio), su corrección y el E2E `tests/e2e/offline-screens.spec.ts`: [PR #15](https://github.com/lizcast06/PWA-Equipo2/pull/15).
+  - Revisión y aprobación de los PR de Dana ([#12](https://github.com/lizcast06/PWA-Equipo2/pull/12)) y Abraham ([#14](https://github.com/lizcast06/PWA-Equipo2/pull/14)).
+- **Decisión técnica y motivo:** el flujo crítico (crear → guardar sin conexión → recargar → reconectar → una sola sincronizada) se prueba con Playwright en un navegador real contra `next start`, porque solo ahí existen el Service Worker, la recarga sin red (`context.setOffline`) y los permisos simulados. Cada pantalla se verifica por **su propio título** y no por texto suelto, porque el inicio también lista las inspecciones locales y una aserción débil daba un falso aprobado (así se encontró D10).
+- **Prueba/comando que ejecuté:** `npm run build` y `E2E_SKIP_BUILD=1 npx playwright test --repeat-each=5`; defecto controlado en la rama temporal `defecto/w08-sin-idempotencia` (sin la protección de duplicados de `SyncQueue.enqueue`) con `npm run test:unit` y CI; `offline-screens.spec.ts` ejecutado contra el código anterior y contra la corrección.
+- **Resultado observado y enlace al reporte:** 9 pruebas E2E, 45/45 en 5 repeticiones. Defecto controlado: CI **rojo** en [run 40061332791](https://github.com/lizcast06/PWA-Equipo2/actions/runs/40061332791) (falla "Unit + integración" y los reportes se suben igual) y **verde** tras el revert en [run 40061487918](https://github.com/lizcast06/PWA-Equipo2/actions/runs/40061487918). `offline-screens.spec.ts`: 2/2 fallan con el código anterior y 2/2 pasan con el arreglo. Detalle en `docs/test-strategy.md` §5 y §6.
+- **Qué demuestra y qué no demuestra:** demuestra que la inspección capturada sin red persiste tras recargar, se sincroniza una sola vez al reconectar, que cada pantalla y el detalle abren sin conexión y que la captura se completa sin cámara ni permiso de ubicación. No demuestra el comportamiento con un backend real (el remoto es simulado), en Safari/iOS ni con sensores físicos; además, con el defecto de duplicados el E2E siguió en verde, por eso ese riesgo se cubre con unit e integración.
+- **Limitación o riesgo:** el Service Worker precachea una lista fija de rutas y los tres detalles sembrados; una inspección sembrada nueva no tendría detalle sin red hasta visitarla con conexión.
+- **IA: herramienta, propósito, partes influidas y validación propia:** usé Claude Code (Anthropic) para proponer la configuración de Vitest/Playwright, redactar los E2E, la auditoría de pantallas y `docs/test-strategy.md`. Validé ejecutando cada prueba en local y en CI, repitiendo la suite 5 veces, comprobando que el defecto controlado y el código anterior hacen fallar las pruebas, y revisando que los resultados citados coinciden con las ejecuciones enlazadas.
+
+<!-- Dana Lizbeth y Abraham: agreguen aquí su bloque "## Nombre: ..." con la plantilla de la semana 8, cada quien en su propio commit. -->
+
+---
 # Semana 6: Capacidades del dispositivo y notificaciones
 
 ## Integrante 1: Dana Lizbeth Castañeda Sánchez
