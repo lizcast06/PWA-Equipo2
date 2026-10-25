@@ -1,6 +1,52 @@
 # Evidencia individual del proyecto
 
 ---
+# Semana 8: Probar la PWA completa y automatizar la verificación
+
+Equipo 10A: Dana Lizbeth Castañeda Sánchez · Abraham Cervantes Romero · Emmanuel Castro Salvador.
+El SHA final común se entrega en Classroom tras el último commit.
+
+## Nombre: Emmanuel Castro Salvador
+
+- **Grupo y equipo:** 10A · Equipo Dana Lizbeth Castañeda Sánchez, Abraham Cervantes Romero y Emmanuel Castro Salvador (líder).
+- **Mi contribución de esta semana y enlace:**
+  - Diagnóstico de la versión de la semana 6 y conexión de captura, guardado offline, Pendientes y Ajustes a la interfaz para que el flujo pudiera probarse: [PR #10](https://github.com/lizcast06/PWA-Equipo2/pull/10).
+  - Base de la pirámide (Vitest, Playwright, lint, `typecheck`, cobertura, `make verify`): [PR #11](https://github.com/lizcast06/PWA-Equipo2/pull/11).
+  - E2E `tests/e2e/offline-flow.spec.ts` y `tests/e2e/device-denied.spec.ts`, `docs/test-strategy.md` y defecto controlado: [PR #13](https://github.com/lizcast06/PWA-Equipo2/pull/13).
+  - Auditoría con aserciones estrictas que encontró el hallazgo D10 (sin conexión el detalle mostraba el inicio), su corrección y el E2E `tests/e2e/offline-screens.spec.ts`: [PR #15](https://github.com/lizcast06/PWA-Equipo2/pull/15).
+  - Revisión y aprobación de los PR de Dana ([#12](https://github.com/lizcast06/PWA-Equipo2/pull/12)) y Abraham ([#14](https://github.com/lizcast06/PWA-Equipo2/pull/14)).
+- **Decisión técnica y motivo:** el flujo crítico (crear → guardar sin conexión → recargar → reconectar → una sola sincronizada) se prueba con Playwright en un navegador real contra `next start`, porque solo ahí existen el Service Worker, la recarga sin red (`context.setOffline`) y los permisos simulados. Cada pantalla se verifica por **su propio título** y no por texto suelto, porque el inicio también lista las inspecciones locales y una aserción débil daba un falso aprobado (así se encontró D10).
+- **Prueba/comando que ejecuté:** `npm run build` y `E2E_SKIP_BUILD=1 npx playwright test --repeat-each=5`; defecto controlado en la rama temporal `defecto/w08-sin-idempotencia` (sin la protección de duplicados de `SyncQueue.enqueue`) con `npm run test:unit` y CI; `offline-screens.spec.ts` ejecutado contra el código anterior y contra la corrección.
+- **Resultado observado y enlace al reporte:** 9 pruebas E2E, 45/45 en 5 repeticiones. Defecto controlado: CI **rojo** en [run 40061332791](https://github.com/lizcast06/PWA-Equipo2/actions/runs/40061332791) (falla "Unit + integración" y los reportes se suben igual) y **verde** tras el revert en [run 40061487918](https://github.com/lizcast06/PWA-Equipo2/actions/runs/40061487918). `offline-screens.spec.ts`: 2/2 fallan con el código anterior y 2/2 pasan con el arreglo. Detalle en `docs/test-strategy.md` §5 y §6.
+- **Qué demuestra y qué no demuestra:** demuestra que la inspección capturada sin red persiste tras recargar, se sincroniza una sola vez al reconectar, que cada pantalla y el detalle abren sin conexión y que la captura se completa sin cámara ni permiso de ubicación. No demuestra el comportamiento con un backend real (el remoto es simulado), en Safari/iOS ni con sensores físicos; además, con el defecto de duplicados el E2E siguió en verde, por eso ese riesgo se cubre con unit e integración.
+- **Limitación o riesgo:** el Service Worker precachea una lista fija de rutas y los tres detalles sembrados; una inspección sembrada nueva no tendría detalle sin red hasta visitarla con conexión.
+- **IA: herramienta, propósito, partes influidas y validación propia:** usé Claude Code (Anthropic) para proponer la configuración de Vitest/Playwright, redactar los E2E, la auditoría de pantallas y `docs/test-strategy.md`. Validé ejecutando cada prueba en local y en CI, repitiendo la suite 5 veces, comprobando que el defecto controlado y el código anterior hacen fallar las pruebas, y revisando que los resultados citados coinciden con las ejecuciones enlazadas.
+
+## Nombre: Abraham Cervantes Romero
+
+- **Grupo y equipo:** 10A · Equipo Dana Lizbeth Castañeda Sánchez, Abraham Cervantes Romero y Emmanuel Castro Salvador.
+- **Mi contribución de esta semana y enlace:**
+  - Regla de validación `validateInspectionInput` como función pura en `src/lib/validation/inspection.ts`, usada por el formulario `src/app/inspecciones/nueva/page.tsx`; pruebas unitarias de la validación y de la cola (`tests/unit/inspection-validation.test.ts`, `tests/unit/sync-queue.test.ts`); integración de persistencia offline y reintento sin duplicado (`tests/integration/offline-persistence.test.ts`); filas correspondientes de `docs/test-strategy.md`: [PR #14](https://github.com/lizcast06/PWA-Equipo2/pull/14).
+  - Revisión y aprobación del [PR #15](https://github.com/lizcast06/PWA-Equipo2/pull/15).
+- **Decisión técnica y motivo:** saqué la validación del componente a una función pura para probarla con entradas válidas e inválidas sin React, y el formulario la sigue usando para que no sea una función sin consumidor. En la integración inyecté el remoto como parámetro de `syncPendingInspections` y usé un fixture que guarda **cada llamada en un arreglo**. El remoto simulado de la app guarda por id, así que escondería un envío duplicado.
+- **Prueba/comando que ejecuté:** `npm run test:unit`, `npm run test:integration`, `npm run test:coverage`, `npm run lint` y `npm run typecheck`. Además ensayé el defecto en local: quité la protección de duplicados de `SyncQueue` (en `enqueue` y en `processQueue`) y corrí `npx vitest run`.
+- **Resultado observado y enlace al reporte:** 33/33 en Vitest (24 unitarias y 9 de integración). Con el defecto fallaron 4, entre ellas "reintentar la misma operación (duplicada en la cola) no crea un duplicado en el remoto", y al restaurar volvieron a pasar las 33. Cobertura: `validation/inspection.ts` 100 %, `sync/queue.ts` 96 % y `storage/local-store.ts` 74 % (antes 0 %). CI en verde del PR (commit `455c237`): [run 40067465676](https://github.com/lizcast06/PWA-Equipo2/actions/runs/40067465676); la cobertura y el JUnit están en su artefacto `reportes-w08-bc89f1186e1a3e7246ea7d6c6731063cc8d9bd58`. Hallazgos D8 y D9 en `docs/test-strategy.md` §2.
+- **Qué demuestra y qué no demuestra:** demuestra que una captura inválida se rechaza con su mensaje, incluido "Hallazgos" vacío (hallazgo D8: antes pasaba como 0 porque `Number("")` es 0). También demuestra que lo guardado sin red queda en `localStorage` con su operación en la cola, que al reconectar queda sincronizado y que reintentar la misma operación envía una sola vez. No demuestra un backend real ni errores HTTP: `navigator.onLine` y `localStorage` son de jsdom y el remoto es un fixture. La recarga real con Service Worker la prueba el E2E.
+- **Limitación o riesgo:** al escribir la integración encontré que `syncPendingInspections` marcaba como "conflicto" envíos correctos cuando el remoto no era el simulado (hallazgo D9), y lo corregí. Además, con el defecto oficial de la rama (quitar solo la protección de `enqueue`) mi prueba de integración sigue en verde, porque `processQueue` tiene una segunda protección. Ese defecto lo detectan las unitarias.
+- **IA: herramienta, propósito, partes influidas y validación propia:** usé Claude Code (Anthropic) para escribir la función de validación, las pruebas unitarias y de integración y su parte de `docs/test-strategy.md`; influyó en todo el código del PR #14. Lo validé corriendo los comandos de arriba, ensayando el defecto para ver que las pruebas fallan y leyendo cada prueba para poder explicarla.
+
+## Nombre: Dana Lizbeth Castañeda Sánchez
+
+- **Grupo y equipo:** 10A · Equipo Dana Lizbeth Castañeda Sánchez, Abraham Cervantes Romero y Emmanuel Castro Salvador.
+- **Mi contribución de esta semana y enlace:** Creación del workflow de CI en GitHub Actions (`.github/workflows/academic-evaluation.yml`), configuración de la subida de artefactos y actualización de la sección de verificación en el `README.md`. Enlace a mi PR #12: https://github.com/lizcast06/PWA-Equipo2/pull/12
+- **Decisión técnica y motivo:** Se estructuró el pipeline en 8 etapas jerárquicas con Node 22 para automatizar desde el lint y comprobación de tipos hasta las pruebas E2E con Playwright. Se incluyó `if: always()` en la etapa de subida de artefactos para garantizar la preservación de reportes de cobertura y errores ante cualquier falla.
+- **Prueba/comando que ejecuté:** `npm run lint && npm run typecheck && npm run build && npm run test:coverage && npm run test:e2e`
+- **Resultado observado y enlace al reporte:** Pipeline ejecutado en CI. Corrida verde de mi PR: https://github.com/lizcast06/PWA-Equipo2/actions/runs/40058150467 . Demostración de fallo controlado (rojo): https://github.com/lizcast06/PWA-Equipo2/actions/runs/40061332791 y su posterior recuperación en verde: https://github.com/lizcast06/PWA-Equipo2/actions/runs/40061487918
+- **Qué demuestra y qué no demuestra:** Demuestra que el código cumple con los estándares estáticos, compila correctamente y supera las pruebas unitarias, de integración y E2E dentro del runner de GitHub. No demuestra el comportamiento de la PWA en un entorno de despliegue real en producción ni bajo concurrencia.
+- **Limitación o riesgo:** En el primer intento de prueba de fallo, una variable no utilizada no detuvo el paso de lint debido a la configuración por defecto de Next.js. Además, la ejecución de Playwright en CI añade tiempo extra de construcción al instalar los binarios de Chromium.
+- **IA: herramienta, propósito, partes influidas y validación propia:** Gemini (Google). Se utilizó para estructurar el YAML del flujo de GitHub Actions, redactar la explicación técnica de las etapas y formatear la sección del README.md. Se validó ejecutando las tareas `npm` localmente y verificando las corridas en el panel de Actions.
+
+---
 # Semana 6: Capacidades del dispositivo y notificaciones
 
 ## Integrante 1: Dana Lizbeth Castañeda Sánchez
