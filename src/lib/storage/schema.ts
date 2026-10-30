@@ -7,6 +7,8 @@ export interface StoredInspection {
   status: "borrador" | "pendiente_sync" | "sincronizado" | "conflicto";
   updatedAt: number;
   version: number;
+  /** Usuario sintético que creó la inspección (semana 9: control de acceso por dueño). */
+  ownerId?: string;
   payload: Record<string, unknown>;
 }
 

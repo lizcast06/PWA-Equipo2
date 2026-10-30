@@ -11,6 +11,7 @@ import {
   requestNotificationPermission,
 } from "../../lib/notifications/client";
 import { clearLocalData, getLocalInspections } from "../../lib/storage/local-store";
+import { getCurrentUser, setCurrentUser, SYNTHETIC_USERS } from "../../lib/security/session";
 
 const PERMISSION_TEXT: Record<NotificationPermissionState, string> = {
   granted: "Activadas",
@@ -23,8 +24,10 @@ export default function AjustesPage() {
   const { online, offlineReadiness, pendingCount } = useAppStatus();
   const [permission, setPermission] = useState<NotificationPermissionState>("default");
   const [localCount, setLocalCount] = useState(0);
+  const [userId, setUserId] = useState("");
 
   useEffect(() => {
+    setUserId(getCurrentUser()?.id ?? "");
     setPermission(checkNotificationSupport() ? (Notification.permission as NotificationPermissionState) : "unsupported");
     setLocalCount(getLocalInspections().length);
   }, []);
@@ -69,6 +72,32 @@ export default function AjustesPage() {
         </header>
 
         <section className="bg-slate-800 rounded-xl border border-slate-700 px-5 divide-y divide-slate-700">
+          <div className={row}>
+            <div>
+              <h3 className="text-sm font-semibold text-slate-100 m-0 mb-0.5">Sesión</h3>
+              <p className="text-xs text-slate-400">Usuario sintético con el que se registran las inspecciones en este dispositivo.</p>
+            </div>
+            <select
+              aria-label="Usuario de la sesión"
+              value={userId}
+              onChange={(event) => {
+                const user = setCurrentUser(event.target.value);
+                setUserId(user.id);
+                showToast(`Sesión iniciada como ${user.name} (${user.role}).`, "success");
+              }}
+              className="rounded-lg bg-slate-900 border border-slate-700 px-3 py-1.5 text-xs text-slate-100"
+            >
+              <option value="" disabled>
+                Elegir usuario...
+              </option>
+              {SYNTHETIC_USERS.map((user) => (
+                <option key={user.id} value={user.id}>
+                  {user.name} · {user.role}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div className={row}>
             <div>
               <h3 className="text-sm font-semibold text-slate-100 m-0 mb-0.5">Notificaciones</h3>

@@ -1,5 +1,6 @@
 import { DB_CONFIG, StoredInspection, SyncQueueItem } from "./schema";
 import { SyncQueue } from "../sync/queue";
+import { getCurrentUser } from "../security/session";
 
 // Persistencia local en el dispositivo (localStorage) para las inspecciones
 // capturadas en campo y su cola de sincronización.
@@ -82,6 +83,7 @@ export function saveNewInspection(input: NewInspectionInput): StoredInspection {
     status: "pendiente_sync",
     updatedAt: now,
     version: 1,
+    ownerId: getCurrentUser()?.id,
     payload: {
       summary: input.summary.trim(),
       date: new Date(now).toISOString().slice(0, 10),
