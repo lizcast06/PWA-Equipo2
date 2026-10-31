@@ -79,6 +79,11 @@ export default function PendientesPage() {
                       {item.location}
                     </Link>
                     <p className="text-xs text-slate-400 truncate">{payload.summary}</p>
+                    {item.status === "conflicto" && payload.rejection && (
+                      <p className="text-xs text-red-300">
+                        Rechazada por el servidor ({payload.rejection.status}): {payload.rejection.error}
+                      </p>
+                    )}
                   </div>
                   {item.status === "conflicto" && (
                     <button

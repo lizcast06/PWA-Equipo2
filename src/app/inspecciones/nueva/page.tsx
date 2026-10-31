@@ -11,6 +11,8 @@ import { saveNewInspection } from "../../../lib/storage/local-store";
 import { showToast } from "../../../lib/pwa/toast";
 import { inspectionDetailHref } from "../../../lib/routes";
 import { InspectionFormErrors, validateInspectionInput } from "../../../lib/validation/inspection";
+import { minimizeLocation } from "../../../lib/security/privacy";
+import { getCurrentUser, SESSION_CHANGED_EVENT, type SyntheticUser } from "../../../lib/security/session";
 
 const KNOWN_LABS = Array.from(new Set(inspections.map((item) => item.location)));
 const OTHER_LAB = "__otro__";
@@ -50,6 +52,14 @@ export default function NuevaInspeccionPage() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [saving, setSaving] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [user, setUser] = useState<SyntheticUser | undefined>();
+
+  useEffect(() => {
+    const load = () => setUser(getCurrentUser());
+    load();
+    window.addEventListener(SESSION_CHANGED_EVENT, load);
+    return () => window.removeEventListener(SESSION_CHANGED_EVENT, load);
+  }, []);
 
   const [stream, setStream] = useState<MediaStream | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -123,7 +133,8 @@ export default function NuevaInspeccionPage() {
         findings: Number(findings),
         summary,
         photo,
-        coords: geo?.coords,
+        // Minimización (riesgo R1): se guarda la ubicación aproximada, nunca la precisa del GPS.
+        coords: geo?.coords ? minimizeLocation(geo.coords) : undefined,
       });
       showToast(
         navigator.onLine
@@ -157,6 +168,19 @@ export default function NuevaInspeccionPage() {
             Funciona aunque no haya internet: se guarda en este dispositivo y se envía sola al recuperar la conexión.
           </p>
         </header>
+
+        {/* Aviso de sesión: el servidor responde 401/403 (src/lib/security/access.ts). */}
+        {!user && (
+          <p role="status" className="text-xs rounded-lg border border-amber-500/40 bg-amber-500/10 text-amber-200 px-3 py-2">
+            No has iniciado sesión: la inspección se guardará en este dispositivo, pero el servidor no la aceptará hasta que
+            elijas tu usuario en <Link href="/ajustes" className="underline">Ajustes</Link>.
+          </p>
+        )}
+        {user?.role === "visitante" && (
+          <p role="status" className="text-xs rounded-lg border border-amber-500/40 bg-amber-500/10 text-amber-200 px-3 py-2">
+            El rol visitante no puede registrar inspecciones: el servidor rechazará el envío.
+          </p>
+        )}
 
         <form onSubmit={onSubmit} noValidate className="space-y-5 bg-slate-800 rounded-xl border border-slate-700 p-5">
           <div className="space-y-1.5">
@@ -262,8 +286,8 @@ export default function NuevaInspeccionPage() {
             {geo?.coords ? (
               <div className="text-xs rounded-lg border border-slate-700 bg-slate-900/50 p-3 space-y-1">
                 <p className="text-slate-200">
-                  {geo.coords.latitude.toFixed(4)}, {geo.coords.longitude.toFixed(4)}
-                  <span className="text-slate-400"> (±{Math.round(geo.coords.accuracy)} m)</span>
+                  {minimizeLocation(geo.coords).latitude.toFixed(2)}, {minimizeLocation(geo.coords).longitude.toFixed(2)}
+                  <span className="text-slate-400"> (se guarda solo aproximada, ~1 km)</span>
                 </p>
                 {geo.coords.synthetic && (
                   <p className="text-amber-300">
