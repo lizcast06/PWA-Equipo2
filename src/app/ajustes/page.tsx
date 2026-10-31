@@ -12,6 +12,7 @@ import {
 } from "../../lib/notifications/client";
 import { clearLocalData, getLocalInspections } from "../../lib/storage/local-store";
 import { getCurrentUser, setCurrentUser, SYNTHETIC_USERS } from "../../lib/security/session";
+import { countUnsentInspections, logout } from "../../lib/security/logout";
 
 const PERMISSION_TEXT: Record<NotificationPermissionState, string> = {
   granted: "Activadas",
@@ -61,6 +62,20 @@ export default function AjustesPage() {
     showToast("Datos locales borrados.", "success");
   };
 
+  // Cerrar sesión borra todo lo capturado en este dispositivo (riesgo R3 del modelo de amenazas).
+  const signOut = async () => {
+    const unsent = countUnsentInspections();
+    const message =
+      unsent > 0
+        ? `Hay ${unsent} inspección(es) sin enviar. Al cerrar sesión se borrarán de este dispositivo. ¿Cerrar sesión de todos modos?`
+        : "Al cerrar sesión se borrarán de este dispositivo las inspecciones, la cola y la caché de datos. ¿Continuar?";
+    if (!window.confirm(message)) return;
+    const result = await logout();
+    setUserId("");
+    setLocalCount(0);
+    showToast(`Sesión cerrada. Se borraron ${result.removedInspections} inspección(es) de este dispositivo.`, "success");
+  };
+
   const row = "flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 py-4";
 
   return (
@@ -96,6 +111,15 @@ export default function AjustesPage() {
                 </option>
               ))}
             </select>
+            {userId && (
+              <button
+                type="button"
+                onClick={signOut}
+                className="px-3 py-1.5 rounded-lg border border-amber-600 text-xs font-semibold text-amber-200 hover:bg-amber-950"
+              >
+                Cerrar sesión
+              </button>
+            )}
           </div>
 
           <div className={row}>

@@ -1,5 +1,5 @@
-const CACHE_NAME = "pwa-inspecciones-static-v3";
-const RUNTIME_CACHE = "pwa-inspecciones-runtime-v3";
+const CACHE_NAME = "pwa-inspecciones-static-v4";
+const RUNTIME_CACHE = "pwa-inspecciones-runtime-v4";
 
 const PRECACHE_ASSETS = [
   "/",
@@ -9,6 +9,8 @@ const PRECACHE_ASSETS = [
 ];
 
 // Pantallas de la app que deben abrir sin conexión aunque no se hayan visitado.
+// Son públicas y sin datos de la sesión: los registros del usuario viven en localStorage y
+// se borran al cerrar sesión (src/lib/security/logout.ts).
 // "/inspecciones/ver" es la vista de detalle de las inspecciones creadas en el dispositivo
 // (el id va en ?id=), y las tres inspecciones sembradas tienen su propio detalle.
 const PRECACHE_ROUTES = [
@@ -63,8 +65,24 @@ self.addEventListener("activate", (event) => {
   );
 });
 
+// Semana 9 (riesgo R4): NO se guarda "cualquier GET". Solo entra a la caché dinámica lo que
+// está en esta lista permitida: pantallas públicas sin parámetros, archivos de Next.js,
+// íconos y manifest. Nunca respuestas de /api/, con Cache-Control no-store/private, ni URLs
+// con consulta (?id=..., ?_rsc=...), que pueden llevar datos de una persona.
+const CACHEABLE_PATHS = new Set(["/", ...PRECACHE_ROUTES, ...PRECACHE_ASSETS]);
+
+function isCacheable(request, response) {
+  if (!response || response.status !== 200 || response.type !== "basic") return false;
+  const url = new URL(request.url);
+  if (url.pathname.startsWith("/api/")) return false;
+  const cacheControl = (response.headers.get("Cache-Control") || "").toLowerCase();
+  if (cacheControl.includes("no-store") || cacheControl.includes("private")) return false;
+  if (url.pathname.startsWith("/_next/static/")) return true;
+  return url.search === "" && CACHEABLE_PATHS.has(url.pathname);
+}
+
 function putInRuntimeCache(request, response) {
-  if (!response || response.status !== 200 || response.type !== "basic") return response;
+  if (!isCacheable(request, response)) return response;
   const cloned = response.clone();
   caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, cloned));
   return response;

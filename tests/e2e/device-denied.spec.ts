@@ -1,5 +1,6 @@
 import path from "node:path";
 import { expect, test } from "@playwright/test";
+import { signInAs } from "./helpers";
 
 // Capacidades de la semana 6 denegadas o ausentes: la captura debe completarse igual.
 // No se usan sensores reales: se simula la falta de permisos y de API.
@@ -9,6 +10,7 @@ const SAMPLE_PHOTO = path.join(process.cwd(), "public", "icon-192.png");
 test.use({ permissions: [] }); // ningún permiso concedido (geolocalización denegada)
 
 test("sin cámara ni permiso de ubicación se guarda la inspección con respaldo", async ({ page }) => {
+  await signInAs(page, "inspector-b");
   // Navegador sin API de cámara: fuerza el respaldo por selector de archivos.
   await page.addInitScript(() => {
     Object.defineProperty(navigator, "mediaDevices", { value: undefined, configurable: true });
