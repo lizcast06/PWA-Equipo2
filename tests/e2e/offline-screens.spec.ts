@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { signInAs } from "./helpers";
 
 // Cada pantalla debe abrir y ser usable sin conexión, aunque el usuario solo haya
 // visitado el inicio con red. Se comprueba el título propio de cada pantalla para no
@@ -44,6 +45,7 @@ test("sin conexión, cada pantalla abre con su propio contenido", async ({ page,
 
 test("sin conexión, el detalle de una inspección nueva abre desde Pendientes y tras recargar", async ({ page, context }) => {
   const summary = "E2E sintético: detalle sin conexión.";
+  await signInAs(page, "inspector-a");
   await openWithServiceWorker(page);
   await context.setOffline(true);
 

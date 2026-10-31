@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { signInAs } from "./helpers";
 
 // Flujo crítico de la semana 8 desde la interfaz:
 // crear → guardar sin conexión → recargar → reconectar → sincronizar sin duplicar.
@@ -19,6 +20,7 @@ async function waitForServiceWorkerControl(page: Page) {
 }
 
 test("crear sin conexión, recargar y sincronizar al reconectar sin duplicados", async ({ page, context }) => {
+  await signInAs(page, "inspector-a");
   await waitForServiceWorkerControl(page);
   await expect(page.getByText("Listo sin conexión")).toBeVisible();
 
