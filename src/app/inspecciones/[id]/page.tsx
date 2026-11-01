@@ -22,6 +22,7 @@ interface InspectionDetail {
   photo?: string;
   coords?: LocalInspectionPayload["coords"];
   syncStatus?: StoredInspection["status"];
+  rejection?: LocalInspectionPayload["rejection"];
 }
 
 function fromLocal(record: StoredInspection): InspectionDetail {
@@ -38,6 +39,7 @@ function fromLocal(record: StoredInspection): InspectionDetail {
     photo: payload.photo,
     coords: payload.coords,
     syncStatus: record.status,
+    rejection: payload.rejection,
   };
 }
 
@@ -165,6 +167,12 @@ export default function InspeccionDetalleCSRPage() {
               </div>
             </div>
 
+            {inspection.syncStatus === "conflicto" && inspection.rejection && (
+              <p role="alert" className="text-xs rounded-lg border border-red-500/40 bg-red-500/10 text-red-200 px-3 py-2">
+                El servidor rechazó el envío ({inspection.rejection.status}): {inspection.rejection.error}
+              </p>
+            )}
+
             {inspection.syncStatus === "conflicto" && (
               <button
                 type="button"
@@ -206,9 +214,9 @@ export default function InspeccionDetalleCSRPage() {
               </div>
               {inspection.coords && (
                 <div className="bg-slate-900/30 p-3 rounded border border-slate-800">
-                  <dt className="text-slate-400">Ubicación:</dt>
+                  <dt className="text-slate-400">Ubicación aproximada (~1 km):</dt>
                   <dd className="font-semibold text-slate-200 mt-0.5">
-                    {inspection.coords.latitude.toFixed(4)}, {inspection.coords.longitude.toFixed(4)}
+                    {inspection.coords.latitude.toFixed(2)}, {inspection.coords.longitude.toFixed(2)}
                     {inspection.coords.synthetic && <span className="block font-normal text-slate-400">(aproximada del campus)</span>}
                   </dd>
                 </div>
