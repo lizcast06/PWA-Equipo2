@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /pendientes
+Disallow: /ajustes
+Disallow: /inspecciones/nueva
+Disallow: /inspecciones/ver
