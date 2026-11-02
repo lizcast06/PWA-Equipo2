@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { signInAs } from "./helpers";
+import { openWithServiceWorker, signInAs } from "./helpers";
 
 // Cada pantalla debe abrir y ser usable sin conexión, aunque el usuario solo haya
 // visitado el inicio con red. Se comprueba el título propio de cada pantalla para no
@@ -13,17 +13,6 @@ const SCREENS: Array<[string, string]> = [
   ["/ajustes", "Ajustes"],
   ["/inspecciones/inspection-002", "Detalle de la inspección"],
 ];
-
-async function openWithServiceWorker(page: Page) {
-  await page.goto("/");
-  await page.evaluate(async () => {
-    await navigator.serviceWorker.ready;
-  });
-  if (!(await page.evaluate(() => Boolean(navigator.serviceWorker.controller)))) {
-    await page.reload();
-  }
-  await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true);
-}
 
 const pageTitle = (page: Page) => page.locator("main h2").first();
 

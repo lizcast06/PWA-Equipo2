@@ -1,5 +1,5 @@
-import { expect, test, type Page } from "@playwright/test";
-import { signInAs } from "./helpers";
+import { expect, test } from "@playwright/test";
+import { openWithServiceWorker, signInAs } from "./helpers";
 
 // Flujo crítico de la semana 8 desde la interfaz:
 // crear → guardar sin conexión → recargar → reconectar → sincronizar sin duplicar.
@@ -7,21 +7,9 @@ import { signInAs } from "./helpers";
 const REMOTE_KEY = "utt_pwa_inspections_db:remote";
 const SUMMARY = "E2E sintético: revisión de extintores sin conexión.";
 
-async function waitForServiceWorkerControl(page: Page) {
-  await page.goto("/");
-  await page.evaluate(async () => {
-    await navigator.serviceWorker.ready;
-  });
-  // La primera carga no queda controlada hasta clients.claim(); se recarga una vez.
-  if (!(await page.evaluate(() => Boolean(navigator.serviceWorker.controller)))) {
-    await page.reload();
-  }
-  await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true);
-}
-
 test("crear sin conexión, recargar y sincronizar al reconectar sin duplicados", async ({ page, context }) => {
   await signInAs(page, "inspector-a");
-  await waitForServiceWorkerControl(page);
+  await openWithServiceWorker(page);
   await expect(page.getByText("Listo sin conexión")).toBeVisible();
 
   await page.getByRole("link", { name: "+ Nueva inspección" }).click();
