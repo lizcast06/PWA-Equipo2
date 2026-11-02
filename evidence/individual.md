@@ -1,6 +1,22 @@
 # Evidencia individual del proyecto
 
 ---
+# Semana 9: Modelo de amenazas y privacidad aplicada
+
+Equipo 10A: Dana Lizbeth Castañeda Sánchez · Abraham Cervantes Romero · Emmanuel Castro Salvador.
+El SHA final común se entrega en Classroom tras el último commit.
+
+## Emmanuel Castro Salvador
+
+- **Estudiante:** Emmanuel Castro Salvador (líder del equipo).
+- **Commit SHA evaluado:** contribución principal `57a3495a` (cerrar sesión y Service Worker), `0c930233` (pruebas negativas) y `238e1486` (modelo de amenazas), integradas en [PR #17](https://github.com/lizcast06/PWA-Equipo2/pull/17), [PR #18](https://github.com/lizcast06/PWA-Equipo2/pull/18) y [PR #21](https://github.com/lizcast06/PWA-Equipo2/pull/21). El SHA final común se registra en Classroom.
+- **Decisión técnica que puedo explicar:** priorizar el riesgo de la tableta perdida o compartida (R3), porque el modo offline guarda datos a propósito. "Cerrar sesión" borra inspecciones, cola, remoto simulado, sesión y cachés dinámicas (`src/lib/security/logout.ts`), y avisa si hay inspecciones sin enviar: preferí perder lo no enviado con advertencia antes que dejar datos de una sesión terminada en un dispositivo compartido. También cambié el Service Worker de "guardar cualquier GET" a una **lista permitida** (`isCacheable` en `public/sw.js`): pantallas públicas sin consulta, `/_next/static`, íconos y manifest.
+- **Prueba que ejecuté y resultado:** `tests/e2e/logout-offline.spec.ts`: capturar con foto y ubicación, cerrar sesión y cortar la red. Resultado: 0 llaves de la app en `localStorage`, ninguna caché con el texto o con `?id=`, y ninguna pantalla muestra la inspección. Defectos controlados: si cerrar sesión solo quita la sesión, la prueba falla mostrando `:inspections`, `:queue` y `:remote`; si el Service Worker vuelve a guardar cualquier GET, falla mostrando 7 URLs, incluida `ver?id=local-…` (`docs/threat-model.md` §6). Regresión local desde cero: lint, tipos, build, Vitest 50/50 y E2E 13 pruebas, 39/39 en 3 repeticiones. CI: [verificación completa](https://github.com/lizcast06/PWA-Equipo2/actions/runs/41379498970).
+- **Limitación o fallo diagnosticado:** `localStorage` no está cifrado: la limpieza no protege si la persona nunca cierra sesión ni ante un XSS exitoso, y no hay backend real, así que 400/401/403 están modelados en `simulatedRemoteSync`. También diagnostiqué una prueba inestable (1 de 77 ejecuciones) al esperar `serviceWorker.ready`; ahora se consulta el estado en intervalos (110/110 en 10 repeticiones). `public-tests/check.sh` no sirve como detector de credenciales porque imprime `PUBLIC_OK` aunque encuentre coincidencias; la revisión real está en `docs/threat-model.md` §5.
+- **Cambio que podría defender o modificar en vivo:** agregar `/api/` real a la lista de exclusión es inmediato; podría pedir la confirmación de cierre de sesión con un resumen de lo que se borrará, o agregar una ruta nueva a `CACHEABLE_PATHS` y mostrar qué prueba debe seguir pasando.
+- **Uso declarado de IA (herramienta, propósito, validación):** Claude Code (Anthropic), para proponer los controles, escribir `logout.ts`, los cambios de `sw.js`, las pruebas E2E y `docs/threat-model.md`, y para corregir el inventario y el README en el PR #21. Validé ejecutando las pruebas en local y en CI, comprobando con defectos controlados que fallan sin el control y revisando que el documento coincide con el código. Puedo explicar y modificar cada parte.
+
+---
 # Semana 8: Probar la PWA completa y automatizar la verificación
 
 Equipo 10A: Dana Lizbeth Castañeda Sánchez · Abraham Cervantes Romero · Emmanuel Castro Salvador.
