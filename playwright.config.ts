@@ -5,6 +5,8 @@ const PORT = Number(process.env.E2E_PORT ?? 3100);
 // E2E del flujo crítico contra el build de producción (next start).
 export default defineConfig({
   testDir: "tests/e2e",
+  // El Service Worker precachea todas las pantallas al instalarse; en CI cargado puede tardar.
+  timeout: 90_000,
   // Subcarpeta propia: Playwright vacía su outputDir al iniciar y borraría el JUnit de Vitest.
   outputDir: "test-results/e2e",
   fullyParallel: false,

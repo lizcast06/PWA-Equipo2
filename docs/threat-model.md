@@ -60,8 +60,8 @@ Prioridad = impacto × probabilidad en el contexto de una tableta de laboratorio
 |---|---|---|---|
 | R3 | **Cerrar sesión borra todo lo capturado**: inspecciones, cola, remoto simulado, sesión y cachés dinámicas; advierte si hay inspecciones sin enviar | `src/lib/security/logout.ts` · botón en `src/app/ajustes/page.tsx` | Emmanuel |
 | R4 | **Lista permitida en el Service Worker**: solo pantallas públicas sin parámetros, `/_next/static`, íconos y manifest; nunca `/api/`, `Cache-Control: no-store`/`private` ni URLs con consulta | `public/sw.js` (`isCacheable`, v4) | Emmanuel |
-| R2 | **Mínimo privilegio** (inspector: solo lo propio; supervisor: solo su alcance; visitante: nada; sin sesión: 401) y **validación en el servidor** (400) | `src/lib/security/access.ts`, `validation.ts`, `src/lib/storage/local-store.ts` | Abraham |
-| R1 | **Minimización de ubicación** (~1 km, sin precisión del GPS) antes de guardar | `src/lib/security/privacy.ts`, `src/app/inspecciones/nueva/page.tsx` | Abraham |
+| R2 | **Mínimo privilegio** con `authorize()` (inspector: solo lo propio; supervisor: solo su alcance; visitante: nada; sin sesión: 401) y **validación en el servidor** con `validateForServer()` (400). `simulatedRemoteSync` aplica ambas antes de guardar y no deja sobrescribir la inspección de otra persona. Un rechazo es definitivo: sale de la cola y la pantalla muestra el motivo | `src/lib/security/access.ts`, `validation.ts`, `src/lib/storage/local-store.ts` | Abraham |
+| R1 | **Minimización de ubicación** con `minimizeLocation()` (2 decimales ≈ 1 km, sin `accuracy`) en el formulario y otra vez en `saveNewInspection`; el servidor rechaza coordenadas más precisas | `src/lib/security/privacy.ts`, `src/app/inspecciones/nueva/page.tsx`, `src/lib/storage/local-store.ts` | Abraham |
 | R5 | **CSP y encabezados** (`object-src 'none'`, `frame-ancestors 'none'`, `nosniff`, `Permissions-Policy`) y `robots.txt` para no indexar pantallas internas | `next.config.mjs`, `public/robots.txt` | Dana |
 | R6 | Sin credenciales en el código; `.env*` en `.gitignore`; datos sintéticos | `.gitignore`, revisión de PR | Equipo |
 | Base | **Sesión sintética con roles** y dueño (`ownerId`) en cada inspección | `src/lib/security/session.ts`, `src/lib/storage/local-store.ts` | Emmanuel |
@@ -74,9 +74,10 @@ Controles heredados que siguen vigentes: textos renderizados por React (sin `inn
 |---|---|---|
 | R3 | `tests/e2e/logout-offline.spec.ts` › "cerrar sesión borra lo capturado y sin conexión no queda nada visible ni guardado" | Tras capturar con foto y ubicación y cerrar sesión: 0 llaves de la app en `localStorage`, ninguna caché con el texto ni con `?id=`, y sin red ni el inicio, ni Pendientes, ni el detalle muestran la inspección |
 | R4 | `tests/e2e/logout-offline.spec.ts` › "el Service Worker no guarda pantallas con datos de la sesión" | Después de abrir el detalle propio y navegar, la caché no tiene URLs con `?id=` ni `_rsc=` (el shell sí está) |
-| R2 | `tests/security.spec.ts` (403 inspector ajeno, 401 sin sesión, 400 datos fuera de rango, supervisor fuera de alcance) | El remoto no guarda lo rechazado y lo permitido sí pasa |
-| R1 | `tests/security.spec.ts` › ubicación minimizada | En `localStorage` no queda la precisión original |
+| R2 | `tests/security.spec.ts` › "401 · sin sesión…", "403 · mínimo privilegio" (inspector A sobre B, `ownerId` manipulado en la cola, visitante, supervisor fuera de alcance) y "400 · el servidor vuelve a validar…" (hallazgos = 999, descripción de 5000 caracteres, tipos manipulados) | El remoto no guarda lo rechazado. El bloque "casos permitidos" comprueba que lo legítimo sí pasa |
+| R1 | `tests/security.spec.ts` › "minimización de ubicación (R1)" y "ubicación precisa inyectada en la cola: 400" | En `localStorage` quedan 2 decimales y sin `accuracy`; el servidor tampoco acepta la precisa |
 | R5 | `tests/e2e/security-headers.spec.ts` | Las respuestas traen la CSP y los headers, y la app sigue funcionando con ellos |
+| R6 | Revisión del repositorio con `git grep` de patrones de credenciales (`ghp_`, `sk-`, `AKIA`, llaves privadas, cadenas de conexión con usuario y clave) y de archivos `.env` versionados | **Ninguna coincidencia** (1 de noviembre de 2026). Es una revisión puntual, no un control automático |
 | Regresión | Todos los E2E de semanas anteriores inician sesión con `signInAs` (`tests/e2e/helpers.ts`) | Los controles nuevos no rompen el flujo offline |
 
 ## 6. Defectos controlados (evidencia de que las pruebas detectan la regresión)
@@ -101,6 +102,16 @@ Hallazgo: quitar **solo** `clearLocalData()` no basta para que falle, porque `lo
   + "http://localhost:3100/inspecciones?_rsc=1e3q4"   (y 4 más)
 ```
 
+**R2 y R1 · ensayo local de Abraham** (detalle en el [PR #19](https://github.com/lizcast06/PWA-Equipo2/pull/19)):
+
+| Defecto | Pruebas de `tests/security.spec.ts` que fallan |
+|---|---|
+| Quitar `authorize` en `simulatedRemoteSync` | 6 (401, 403 A→B, visitante, supervisor y reintento) |
+| Quitar `validateForServer` | 3 (hallazgos = 999, texto enorme y ubicación precisa) |
+| Guardar `coords` sin minimizar | 2 (minimización y caso permitido) |
+
+En los tres casos se restauró el código y volvió a 17/17.
+
 ## 7. Límites y trade-offs
 
 - **No hay backend real.** El "servidor" es `simulatedRemoteSync`; las respuestas 400/401/403 se modelan ahí. En producción la misma regla debe vivir en la API, porque todo lo que corre en el navegador se puede modificar.
@@ -109,5 +120,6 @@ Hallazgo: quitar **solo** `clearLocalData()` no basta para que falle, porque `lo
 - **Pantallas públicas en caché.** El shell, el catálogo y los tres detalles sembrados se precachean (son contenido público sintético) aunque el detalle dinámico responda `no-store`; es una lista explícita, no "cualquier GET".
 - **CSP con `'unsafe-inline'` en scripts:** Next.js 14 inyecta scripts en línea para hidratar; sin nonces la app no funciona. La CSP se mantiene como capa adicional, no como único control contra XSS.
 - **`robots.txt` no es un control de acceso**: solo evita la indexación; cualquiera puede ignorarlo.
-- **Sesión sintética** elegida en Ajustes: modela roles y dueño, no autentica identidades reales.
+- **Sesión sintética** elegida en Ajustes: modela roles y dueño, no autentica identidades reales. Sin sesión la inspección se guarda en el dispositivo, pero el servidor responde 401 hasta iniciar sesión y reintentar; la pantalla lo avisa.
+- **`public-tests/check.sh` no sirve como detector de credenciales:** imprime `PUBLIC_OK` aunque su búsqueda encuentre coincidencias, porque en bash un comando negado con `!` no detiene `set -e`. Sus coincidencias en este repositorio son menciones de la palabra en documentos (`START_HERE.md`, `docs/`, `evidence/`) y el paquete `js-tokens` en `package-lock.json`, no credenciales. Por eso no se afirma "sin coincidencias", y la revisión real es la de §5.
 - **HTTPS** se asume en el despliegue: protege el trayecto, no corrige XSS, autorizaciones defectuosas ni datos que quedan en el dispositivo (diapositiva 10).
