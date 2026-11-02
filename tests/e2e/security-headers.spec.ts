@@ -33,7 +33,13 @@ test.describe("Seguridad · Encabezados HTTP y CSP (Semana 09)", () => {
     // Validar encabezados
     expect(headers["x-content-type-options"]).toBe("nosniff");
 
-    // Comprobar que el formulario es visible bajo la CSP
+    expect(headers["content-security-policy"]).toContain("object-src 'none'");
+
+    // El formulario es visible bajo la CSP
     await expect(page.locator("form")).toBeVisible();
+
+    // Y es interactivo: si la CSP bloqueara el JavaScript, la validación no aparecería
+    await page.getByRole("button", { name: "Guardar inspección" }).click();
+    await expect(page.getByText("Escribe el nombre de quien inspecciona.")).toBeVisible();
   });
 });
