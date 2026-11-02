@@ -107,3 +107,15 @@ El entorno E2E utiliza `playwright.config.ts` configurado para iniciar `next sta
 * Pruebas End-to-End: `tests/e2e/`
 * Estrategia de Pruebas: `docs/test-strategy.md`
 * Pipeline de CI: `.github/workflows/academic-evaluation.yml`
+
+
+
+## Semana 09 · Seguridad y privacidad
+
+### Controles de Seguridad Implementados
+* **Encabezados HTTP & CSP:** Configurados en `next.config.mjs` para mitigar ataques XSS, clickjacking e inyección de frames (`frame-ancestors 'none'`, `object-src 'none'`).
+* **Trade-off de CSP:** Se mantiene `'unsafe-inline'` en `script-src` debido a los requerimientos de scripts en línea para la hidratación en Next.js 14. Las imágenes admiten esquemas `data:` y `blob:` para renderizar capturas de evidencia.
+* **Protección de Indexación:** Implementación de `public/robots.txt` para deshabilitar la indexación en motores de búsqueda de rutas privadas (`/pendientes`, `/ajustes`, `/inspecciones/*`).
+* **Inventario de Privacidad:** Documentado en `docs/privacy-data-inventory.md` considerando a la institución como sujeto obligado de la LGPDPPSO.
+
+### Comandos de Verificación
