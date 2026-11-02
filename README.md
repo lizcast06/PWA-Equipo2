@@ -89,7 +89,7 @@ El entorno E2E utiliza `playwright.config.ts` configurado para iniciar `next sta
 
 ### CI y artefactos
 * **Workflow de la semana 8:** `.github/workflows/academic-evaluation.yml` (job `verify`). Ejecuta en orden: `npm ci` → lint → tipos → build → suites heredadas → unit + integración con cobertura → instalación de Chromium → E2E. Cualquier etapa que falle hace fallar el job. El detalle de cada etapa está en `docs/test-strategy.md` §4.
-* **Artefacto:** cada ejecución publica `reportes-w08-<sha>` en la pestaña *Actions*, **también cuando una prueba falla** (`if: always()`), con:
+* **Artefacto:** cada ejecución publica `reportes-verificacion-<sha>` (en ejecuciones anteriores se llamaba `reportes-w08-<sha>`) en la pestaña *Actions*, **también cuando una prueba falla** (`if: always()`), con:
   * `coverage/`: reporte de cobertura (abrir `coverage/index.html`).
   * `test-results/vitest-junit.xml`: resultados de unit + integración.
   * `test-results/e2e/`: trazas de Playwright de las pruebas que fallen.
@@ -128,3 +128,8 @@ El entorno E2E utiliza `playwright.config.ts` configurado para iniciar `next sta
 * Inventario de privacidad: `docs/privacy-data-inventory.md`.
 * Reglas de seguridad: `src/lib/security/` (`session`, `access`, `validation`, `privacy`, `logout`).
 * Workflow de la actividad: `.github/workflows/week-09-w09-security-privacy.yml`; verificación completa: `.github/workflows/academic-evaluation.yml`.
+
+### Ejecuciones de CI
+* Verificación completa (lint, tipos, build, todas las capas de pruebas y reportes): [Academic Evaluation · Verificación completa](https://github.com/lizcast06/PWA-Equipo2/actions/workflows/academic-evaluation.yml).
+* Checks de la actividad: [week-09-w09-security-privacy](https://github.com/lizcast06/PWA-Equipo2/actions/workflows/week-09-w09-security-privacy.yml).
+* El SHA final y el enlace a su ejecución se registran en la entrega de Classroom, porque escribirlos aquí crearía otro commit distinto al evaluado.

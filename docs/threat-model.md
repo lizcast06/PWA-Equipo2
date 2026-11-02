@@ -77,6 +77,7 @@ Controles heredados que siguen vigentes: textos renderizados por React (sin `inn
 | R2 | `tests/security.spec.ts` › "401 · sin sesión…", "403 · mínimo privilegio" (inspector A sobre B, `ownerId` manipulado en la cola, visitante, supervisor fuera de alcance) y "400 · el servidor vuelve a validar…" (hallazgos = 999, descripción de 5000 caracteres, tipos manipulados) | El remoto no guarda lo rechazado. El bloque "casos permitidos" comprueba que lo legítimo sí pasa |
 | R1 | `tests/security.spec.ts` › "minimización de ubicación (R1)" y "ubicación precisa inyectada en la cola: 400" | En `localStorage` quedan 2 decimales y sin `accuracy`; el servidor tampoco acepta la precisa |
 | R5 | `tests/e2e/security-headers.spec.ts` | Las respuestas traen la CSP y los headers, y la app sigue funcionando con ellos |
+| R6 | Revisión del repositorio con `git grep` de patrones de credenciales (`ghp_`, `sk-`, `AKIA`, llaves privadas, cadenas de conexión con usuario y clave) y de archivos `.env` versionados | **Ninguna coincidencia** (1 de noviembre de 2026). Es una revisión puntual, no un control automático |
 | Regresión | Todos los E2E de semanas anteriores inician sesión con `signInAs` (`tests/e2e/helpers.ts`) | Los controles nuevos no rompen el flujo offline |
 
 ## 6. Defectos controlados (evidencia de que las pruebas detectan la regresión)
@@ -120,4 +121,5 @@ En los tres casos se restauró el código y volvió a 17/17.
 - **CSP con `'unsafe-inline'` en scripts:** Next.js 14 inyecta scripts en línea para hidratar; sin nonces la app no funciona. La CSP se mantiene como capa adicional, no como único control contra XSS.
 - **`robots.txt` no es un control de acceso**: solo evita la indexación; cualquiera puede ignorarlo.
 - **Sesión sintética** elegida en Ajustes: modela roles y dueño, no autentica identidades reales. Sin sesión la inspección se guarda en el dispositivo, pero el servidor responde 401 hasta iniciar sesión y reintentar; la pantalla lo avisa.
+- **`public-tests/check.sh` no sirve como detector de credenciales:** imprime `PUBLIC_OK` aunque su búsqueda encuentre coincidencias, porque en bash un comando negado con `!` no detiene `set -e`. Sus coincidencias en este repositorio son menciones de la palabra en documentos (`START_HERE.md`, `docs/`, `evidence/`) y el paquete `js-tokens` en `package-lock.json`, no credenciales. Por eso no se afirma "sin coincidencias", y la revisión real es la de §5.
 - **HTTPS** se asume en el despliegue: protege el trayecto, no corrige XSS, autorizaciones defectuosas ni datos que quedan en el dispositivo (diapositiva 10).
