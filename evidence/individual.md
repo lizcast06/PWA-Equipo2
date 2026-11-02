@@ -26,6 +26,16 @@ El SHA final común se entrega en Classroom tras el último commit.
 - **Cambio que podría defender o modificar en vivo:** cambiar la precisión de `minimizeLocation()` (por ejemplo a 1 decimal) y mostrar qué prueba cambia; agregar un rol nuevo a la tabla de `authorize()` con su prueba 403; o bajar el límite de la descripción en `validateForServer()` y comprobar el 400.
 - **Uso declarado de IA (herramienta, propósito, validación):** Claude Code (Anthropic) para escribir `access.ts`, `validation.ts`, `privacy.ts`, la conexión en `local-store.ts` y `tests/security.spec.ts`, y para la revisión del PR #21. Lo validé corriendo los comandos de arriba, ensayando los tres defectos para ver que las pruebas fallan, y leyendo cada prueba para poder explicarla.
 
+## Dana Lizbeth Castañeda Sánchez
+
+- **Estudiante:** Dana Lizbeth Castañeda Sánchez
+- **Commit SHA evaluado:** PR #20 — https://github.com/lizcast06/PWA-Equipo2/pull/20
+- **Decisión técnica que puedo explicar:** Configuración de encabezados HTTP de seguridad y Content Security Policy (CSP) en `next.config.mjs`, archivo `public/robots.txt` para restringir la indexación de rutas privadas (`/pendientes`, `/ajustes`, `/inspecciones/*`), suite de pruebas E2E en `tests/e2e/security-headers.spec.ts` e inventario de privacidad en `docs/privacy-data-inventory.md` considerando a la UTT como sujeto obligado de la LGPDPPSO. Explico que el uso de `'unsafe-inline'` en `script-src` es un trade-off necesario porque Next.js 14 requiere inyectar scripts en línea para la hidratación sin nonces estáticos. El inventario se ajustó en el PR #21, cambio que leí y comprendo perfectamente. Mi PR #20 fue revisado y aprobado por Abraham.
+- **Prueba que ejecuté y resultado:** `npm run build && npm run test:e2e` (ejecutando 13 pruebas, incluyendo `security-headers.spec.ts`). Resultado: `13 passed`, confirmando la respuesta correcta de los encabezados HTTP (`nosniff`, `DENY`, CSP) y verificando que la app y el formulario funcionan sin bloqueos.
+- **Limitación o fallo diagnosticado:** En la ejecución local inicial de `npm run test:e2e`, las pruebas fallaron porque no se encontraban los binarios de Chromium instalados en el entorno (`browserType.launch: Executable doesn't exist`), resolviéndolo mediante `npx playwright install chromium`. Adicionalmente, la CSP mantiene `'unsafe-inline'` en scripts como un riesgo conocido por arquitectura del framework.
+- **Cambio que podría defender o modificar en vivo:** Puedo modificar en vivo las directivas de `Permissions-Policy` o actualizar el archivo `public/robots.txt` agregando o retirando reglas `Disallow` según las rutas de la PWA.
+- **Uso declarado de IA (herramienta, propósito, validación):** Gemini (Google). Utilizada para estructurar los test cases de Playwright sobre encabezados HTTP, dar formato a la matriz del inventario de privacidad y diagnosticar la instalación del ejecutable de Chromium para Playwright. Validado ejecutando la compilación y la suite de pruebas E2E con 100% de éxito local.
+
 
 ---
 # Semana 8: Probar la PWA completa y automatizar la verificación
