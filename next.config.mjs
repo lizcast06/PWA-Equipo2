@@ -1,6 +1,17 @@
+import { readFileSync } from "node:fs";
+
+const { version } = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8"));
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Solo el Dockerfile activa la salida standalone; en local y en CI se usa next start.
+  output: process.env.BUILD_STANDALONE === "1" ? "standalone" : undefined,
+  // Identidad de la versión, fija al compilar (src/lib/version.ts).
+  env: {
+    NEXT_PUBLIC_APP_VERSION: process.env.APP_VERSION || version,
+    NEXT_PUBLIC_GIT_SHA: process.env.GIT_SHA || "local",
+  },
   async headers() {
     return [
       {

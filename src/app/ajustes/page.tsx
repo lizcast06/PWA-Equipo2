@@ -13,6 +13,7 @@ import {
 import { clearLocalData, getLocalInspections } from "../../lib/storage/local-store";
 import { getCurrentUser, setCurrentUser, SYNTHETIC_USERS } from "../../lib/security/session";
 import { countUnsentInspections, logout } from "../../lib/security/logout";
+import { APP_VERSION, GIT_SHA } from "../../lib/version";
 
 const PERMISSION_TEXT: Record<NotificationPermissionState, string> = {
   granted: "Activadas",
@@ -182,6 +183,10 @@ export default function AjustesPage() {
             </button>
           </div>
         </section>
+
+        <p className="text-xs text-slate-500">
+          Versión {APP_VERSION} · commit {GIT_SHA.slice(0, 7)}
+        </p>
 
         <p className="text-xs text-slate-500">
           Privacidad: las fotos y la ubicación solo se guardan en este dispositivo junto con la inspección. Usa únicamente datos sintéticos.
