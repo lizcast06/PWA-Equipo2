@@ -1,8 +1,17 @@
-# PWA de inspecciones de laboratorio — proyecto base
+# PWA de inspecciones de laboratorio
 
-Starter oficial para la materia **Aplicaciones Web Progresivas**.
+PWA offline-first para registrar inspecciones y mantenimiento de laboratorios de la Universidad Tecnológica de Tehuacán. Se puede instalar, captura sin conexión y sincroniza sin duplicar. Proyecto integrador de la materia **Aplicaciones Web Progresivas**; **todos los datos son sintéticos**.
 
-Este repositorio es el punto de partida común para las actividades de las semanas 1–13. En la Semana 1 no debes construir todavía toda la PWA: debes poner en marcha este proyecto, documentar el problema y dejar una primera versión reproducible. Cada semana conservarás el mismo repositorio y agregarás la capacidad indicada por la actividad.
+La verificación y las decisiones de cada semana están en las secciones finales de este documento y en `docs/`.
+
+## Supuestos
+
+- **Node 22** (`.nvmrc` y `engines` en `package.json`) y npm 10 o superior.
+- **Sin backend real:** el "servidor" se simula en el navegador (`simulatedRemoteSync`), incluidas las respuestas 400/401/403. En producción esas reglas deben vivir en la API.
+- **Sesión sintética:** se elige un usuario de prueba en Ajustes; no autentica identidades reales.
+- **HTTPS en el despliegue:** cámara, ubicación y Service Worker lo requieren fuera de `localhost`; `Strict-Transport-Security` solo aplica sobre HTTPS.
+- **Navegador de prueba:** Chromium con Playwright; no se prueba Safari/iOS.
+- **Dependencias:** se actualizó a Next.js 15.5 porque la línea 14 del starter tiene avisos críticos sin parche; el detalle está en `docs/threat-model.md` (R7).
 
 ## Requisitos locales
 
