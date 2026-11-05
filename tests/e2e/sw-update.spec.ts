@@ -136,7 +136,13 @@ test("al pulsar Actualizar se activa la nueva, recarga una vez y la inspección 
   await page.waitForTimeout(1_000);
   expect(await page.evaluate(() => Number(sessionStorage.getItem("e2e:reloads") ?? 0)), "debe recargar exactamente una vez").toBe(1);
 
-  // Tras la recarga (sin conexión, servida por la versión nueva) la inspección sigue pendiente.
+  // La recarga reabre sin conexión el detalle local (/inspecciones/ver?id=…, ruta obligatoria
+  // del precache) servido por la versión nueva; muestra la inspección porque su JS lee localStorage.
+  await expect(page).toHaveURL(/\/inspecciones\/ver\?id=local-/);
+  await expect(page.getByRole("heading", { name: "Detalle de la inspección" })).toBeVisible();
+  await expect(page.locator("main")).toContainText(summary);
+
+  // Y en Pendientes sigue como pendiente de envío.
   await page.goto("/pendientes");
   await expect(page.getByText(summary)).toBeVisible();
   await expect(page.getByText("Pendiente de envío")).toBeVisible();
