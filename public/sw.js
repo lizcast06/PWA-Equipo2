@@ -1,5 +1,5 @@
-const CACHE_NAME = "pwa-inspecciones-static-v4";
-const RUNTIME_CACHE = "pwa-inspecciones-runtime-v4";
+const CACHE_NAME = "pwa-inspecciones-static-v5";
+const RUNTIME_CACHE = "pwa-inspecciones-runtime-v5";
 
 const PRECACHE_ASSETS = [
   "/",
@@ -12,42 +12,71 @@ const PRECACHE_ASSETS = [
 // Son públicas y sin datos de la sesión: los registros del usuario viven en localStorage y
 // se borran al cerrar sesión (src/lib/security/logout.ts).
 // "/inspecciones/ver" es la vista de detalle de las inspecciones creadas en el dispositivo
-// (el id va en ?id=), y las tres inspecciones sembradas tienen su propio detalle.
-const PRECACHE_ROUTES = [
+// (el id va en ?id=).
+//
+// Semana 10: el shell se divide en dos grupos.
+// - OBLIGATORIAS: sin ellas no se puede trabajar sin conexión (capturar, ver lo capturado,
+//   revisar pendientes, cambiar de usuario). Si una falla, `install` falla y el navegador
+//   mantiene la versión anterior del Service Worker, que sí está completa.
+// - OPCIONALES: el detalle de las tres inspecciones sembradas de demostración. Si fallan, la
+//   versión nueva se instala igual; esas pantallas se guardan después al visitarlas con red.
+const REQUIRED_ROUTES = [
+  "/",
   "/inspecciones",
   "/inspecciones/nueva",
   "/inspecciones/ver",
-  "/inspecciones/inspection-001",
-  "/inspecciones/inspection-002",
-  "/inspecciones/inspection-003",
   "/pendientes",
   "/ajustes"
 ];
+
+const OPTIONAL_ROUTES = [
+  "/inspecciones/inspection-001",
+  "/inspecciones/inspection-002",
+  "/inspecciones/inspection-003"
+];
+
+const PRECACHE_ROUTES = [...REQUIRED_ROUTES, ...OPTIONAL_ROUTES];
 
 // Archivos de Next.js (JS/CSS) que necesita una página para ser interactiva.
 const STATIC_ASSET_PATTERN = /\/_next\/static\/[^"'\s)\\]+/g;
 
 // Guarda el HTML de la ruta y los archivos JS/CSS que referencia, para que la pantalla
 // funcione sin conexión aunque el usuario nunca la haya abierto con red.
+// Lanza un error si la pantalla o alguno de sus archivos no se pudo guardar: una pantalla sin
+// su JavaScript se ve pero no funciona (el formulario no guardaría nada).
 async function precacheRoute(cache, route) {
   const response = await fetch(route, { cache: "no-store" });
-  if (!response.ok) return;
+  if (!response.ok) throw new Error(`precache ${route}: HTTP ${response.status}`);
   const html = await response.clone().text();
-  await cache.put(route, response);
   const assets = Array.from(new Set(html.match(STATIC_ASSET_PATTERN) || []));
-  await Promise.all(assets.map((asset) => cache.add(asset).catch(() => undefined)));
+  await Promise.all(assets.map((asset) => cache.add(asset)));
+  await cache.put(route, response);
 }
 
 self.addEventListener("install", (event) => {
+  // Semana 10: ya NO se llama skipWaiting() aquí. Si hay una versión anterior controlando
+  // la app, esta queda "en espera" hasta que la persona pulse "Actualizar" (mensaje
+  // SKIP_WAITING). La primera instalación se activa sola porque no hay versión anterior.
   event.waitUntil(
     caches.open(CACHE_NAME).then(async (cache) => {
       await cache.addAll(PRECACHE_ASSETS);
-      // Las rutas se agregan una por una: si alguna falla, la instalación no se cae.
-      await Promise.all(
-        ["/", ...PRECACHE_ROUTES].map((route) => precacheRoute(cache, route).catch(() => undefined))
-      );
-    }).then(() => self.skipWaiting())
+      // Obligatorias: si una falla, la promesa se rechaza y la instalación falla.
+      await Promise.all(REQUIRED_ROUTES.map((route) => precacheRoute(cache, route)));
+      // Opcionales: un fallo no detiene la instalación.
+      await Promise.all(OPTIONAL_ROUTES.map((route) => precacheRoute(cache, route).catch(() => undefined)));
+    })
+    // Sin .catch(): si se rechaza, el navegador descarta este worker ("redundant") y la
+    // versión anterior sigue controlando. No se borra CACHE_NAME aquí porque, si alguien
+    // publica sin subir el número de caché, sería la caché de la versión que sigue activa.
   );
+});
+
+// La interfaz (src/lib/pwa/register-service-worker.ts) envía este mensaje solo cuando la
+// persona pulsa "Actualizar". Entonces la versión en espera se activa y toma el control.
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener("activate", (event) => {
