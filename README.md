@@ -142,3 +142,22 @@ El entorno E2E utiliza `playwright.config.ts` configurado para iniciar `next sta
 * Verificación completa (lint, tipos, build, todas las capas de pruebas y reportes): [Academic Evaluation · Verificación completa](https://github.com/lizcast06/PWA-Equipo2/actions/workflows/academic-evaluation.yml).
 * Checks de la actividad: [week-09-w09-security-privacy](https://github.com/lizcast06/PWA-Equipo2/actions/workflows/week-09-w09-security-privacy.yml).
 * El SHA final y el enlace a su ejecución se registran en la entrega de Classroom, porque escribirlos aquí crearía otro commit distinto al evaluado.
+
+
+
+## Semana 10 · Release
+
+El proceso de release permite construir y verificar una imagen Docker identificada mediante el commit de Git.
+
+- **Versión:** definida en `package.json`.
+- **Construcción:** imagen Docker etiquetada con `github.sha`.
+- **Validación:** `/api/health`, comprobación estricta del commit y pruebas smoke con Playwright.
+- **Artefactos:** manifiesto JSON, imagen Docker comprimida, checksum SHA-256 y reportes.
+- **Recuperación:** procedimiento manual mediante `docker load`.
+
+### Documentación y evidencias
+
+- [Proceso de release y criterios AC-01 a AC-04](docs/release-process.md).
+- [Workflow Academic Evaluation](https://github.com/lizcast06/PWA-Equipo2/actions/workflows/academic-evaluation.yml).
+
+La ejecución de GitHub Actions y la validación de los criterios de aceptación están pendientes de comprobación. Los resultados y enlaces se registrarán después de ejecutar el workflow.
