@@ -1,5 +1,9 @@
 # Imagen reproducible de la PWA (semana 10). Versión fija de Node, dependencias del lockfile.
 # docker build -t pwa-inspecciones:<sha> --build-arg APP_VERSION=<version> --build-arg GIT_SHA=<sha> .
+# Sin --build-arg, la etiqueta y /api/health usan este valor: debe coincidir con package.json
+# (lo comprueba tests/unit/release-version.test.ts).
+ARG APP_VERSION=0.10.0
+
 FROM node:22.22.0-bookworm-slim AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
@@ -7,7 +11,7 @@ RUN npm ci --no-audit --no-fund
 
 FROM node:22.22.0-bookworm-slim AS build
 WORKDIR /app
-ARG APP_VERSION=
+ARG APP_VERSION
 ARG GIT_SHA=local
 ENV NEXT_TELEMETRY_DISABLED=1 BUILD_STANDALONE=1 APP_VERSION=$APP_VERSION GIT_SHA=$GIT_SHA
 COPY --from=deps /app/node_modules ./node_modules
@@ -18,7 +22,7 @@ RUN npm run build
 # pruebas ni dependencias de desarrollo, y corre con un usuario sin privilegios.
 FROM node:22.22.0-bookworm-slim AS runner
 WORKDIR /app
-ARG APP_VERSION=
+ARG APP_VERSION
 ARG GIT_SHA=local
 LABEL org.opencontainers.image.title="pwa-inspecciones" \
       org.opencontainers.image.version="$APP_VERSION" \
