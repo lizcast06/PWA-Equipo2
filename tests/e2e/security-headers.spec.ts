@@ -17,6 +17,7 @@ test.describe("Seguridad · Encabezados HTTP y CSP (Semana 09)", () => {
 
     // Validar X-Content-Type-Options
     expect(headers["x-content-type-options"]).toBe("nosniff");
+    expect(headers["strict-transport-security"]).toContain("max-age=31536000");
 
     // Validar que la página renderiza correctamente
     await expect(page).toHaveTitle(/PWA/i);

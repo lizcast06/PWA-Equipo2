@@ -53,6 +53,7 @@ Prioridad = impacto × probabilidad en el contexto de una tableta de laboratorio
 | **R1** | Se almacena la ubicación precisa aunque la finalidad no la requiere | A3 | Medio | Alta | **4** | Principio de minimización (diapositiva 15) |
 | **R5** | Scripts u orígenes no previstos (XSS, incrustar la app en otro sitio, indexación de pantallas internas) | Todos | Medio | Baja | **5** | React escapa texto por defecto; CSP y headers son una capa adicional |
 | **R6** | Credenciales de servicios en el repositorio | A7 | Alto | Baja | **6** | Hoy no hay servicios externos; se previene con `.gitignore` y revisión |
+| **R7** | Dependencias con vulnerabilidades conocidas: Next 14.2.35 tenía avisos críticos de ejecución remota en `/_next/image` | Todos | Alto | Media | **2** | `/_next/image` responde aunque la app no use `next/image`; se comprobó con una petición real (200). La línea 14 ya no recibe parche |
 
 ## 4. ¿Cómo lo reducimos? (controles)
 
@@ -64,6 +65,7 @@ Prioridad = impacto × probabilidad en el contexto de una tableta de laboratorio
 | R1 | **Minimización de ubicación** con `minimizeLocation()` (2 decimales ≈ 1 km, sin `accuracy`) en el formulario y otra vez en `saveNewInspection`; el servidor rechaza coordenadas más precisas | `src/lib/security/privacy.ts`, `src/app/inspecciones/nueva/page.tsx`, `src/lib/storage/local-store.ts` | Abraham |
 | R5 | **CSP y encabezados** (`object-src 'none'`, `frame-ancestors 'none'`, `nosniff`, `Permissions-Policy`) y `robots.txt` para no indexar pantallas internas | `next.config.mjs`, `public/robots.txt` | Dana |
 | R6 | Sin credenciales en el código; `.env*` en `.gitignore`; datos sintéticos | `.gitignore`, revisión de PR | Equipo |
+| R7 | **Actualizar a Next 15.5.28 / React 19** y forzar una `postcss` corregida con `overrides`. `npm audit --omit=dev` se revisa en cada release | `package.json`, `package-lock.json` | Emmanuel |
 | Base | **Sesión sintética con roles** y dueño (`ownerId`) en cada inspección | `src/lib/security/session.ts`, `src/lib/storage/local-store.ts` | Emmanuel |
 
 Controles heredados que siguen vigentes: textos renderizados por React (sin `innerHTML`), permisos de cámara y ubicación pedidos solo al usarlos con flujo alternativo si se niegan (semana 6, `tests/e2e/device-denied.spec.ts`).
@@ -78,6 +80,7 @@ Controles heredados que siguen vigentes: textos renderizados por React (sin `inn
 | R1 | `tests/security.spec.ts` › "minimización de ubicación (R1)" y "ubicación precisa inyectada en la cola: 400" | En `localStorage` quedan 2 decimales y sin `accuracy`; el servidor tampoco acepta la precisa |
 | R5 | `tests/e2e/security-headers.spec.ts` | Las respuestas traen la CSP y los headers, y la app sigue funcionando con ellos |
 | R6 | Revisión del repositorio con `git grep` de patrones de credenciales (`ghp_`, `sk-`, `AKIA`, llaves privadas, cadenas de conexión con usuario y clave) y de archivos `.env` versionados | **Ninguna coincidencia** (1 de noviembre de 2026). Es una revisión puntual, no un control automático |
+| R7 | `npm audit --omit=dev` y regresión completa tras actualizar (lint, tipos, build, Vitest y E2E) | Sin avisos críticos; la app sigue funcionando igual |
 | Regresión | Todos los E2E de semanas anteriores inician sesión con `signInAs` (`tests/e2e/helpers.ts`) | Los controles nuevos no rompen el flujo offline |
 
 ## 6. Defectos controlados (evidencia de que las pruebas detectan la regresión)
