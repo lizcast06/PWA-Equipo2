@@ -145,19 +145,52 @@ El entorno E2E utiliza `playwright.config.ts` configurado para iniciar `next sta
 
 
 
+
 ## Semana 10 · Release
 
-El proceso de release permite construir y verificar una imagen Docker identificada mediante el commit de Git.
+Cada commit produce una imagen Docker identificada por su versión y su commit, se prueba con un smoke test contra el contenedor y se guarda como artefacto de Actions. El proceso está en [`docs/release-process.md`](docs/release-process.md) y qué hacer si una versión falla (rollback y recuperación del Service Worker), en [`docs/runbook.md`](docs/runbook.md).
 
-- **Versión:** definida en `package.json`.
-- **Construcción:** imagen Docker etiquetada con `github.sha`.
-- **Validación:** `/api/health`, comprobación estricta del commit y pruebas smoke con Playwright.
-- **Artefactos:** manifiesto JSON, imagen Docker comprimida, checksum SHA-256 y reportes.
-- **Recuperación:** procedimiento manual mediante `docker load`.
+### Ejecución
 
-### Documentación y evidencias
+Requisitos: Node 22 (`.nvmrc`), npm 10 o superior y Docker.
 
-- [Proceso de release y criterios AC-01 a AC-04](docs/release-process.md).
-- [Workflow Academic Evaluation](https://github.com/lizcast06/PWA-Equipo2/actions/workflows/academic-evaluation.yml).
+```bash
+npm ci
+make verify
+```
 
-La ejecución de GitHub Actions y la validación de los criterios de aceptación están pendientes de comprobación. Los resultados y enlaces se registrarán después de ejecutar el workflow.
+En Windows sin `make`, el equivalente es:
+
+```bash
+npm run lint && npm run typecheck && npm run build && npm test && npm run verify
+```
+
+Imagen, contenedor y smoke (en Bash; `<sha>` es el commit completo):
+
+```bash
+docker build -t pwa-inspecciones:<sha> --build-arg APP_VERSION=0.10.0 --build-arg GIT_SHA=<sha> .
+docker run -d --name pwa -p 3100:3000 pwa-inspecciones:<sha>
+curl -s http://localhost:3100/api/health
+SMOKE_URL=http://localhost:3100 EXPECTED_COMMIT=<sha> npm run test:smoke
+docker rm -f pwa
+```
+
+`npm run test:smoke` sin `SMOKE_URL` compila y levanta la app con `next start` en el puerto 3110.
+
+### Cómo ver qué versión corre
+
+- `GET /api/health` → `{"status":"ok","version":"0.10.0","commit":"<sha>"}`.
+- Pantalla **Ajustes** → "Versión 0.10.0 · commit abc1234".
+- `docker inspect` → etiquetas `org.opencontainers.image.version` y `org.opencontainers.image.revision`.
+
+### Supuestos
+
+- Los de la sección [Supuestos](#supuestos), más: Docker disponible en local y en el runner de GitHub (`ubuntu-latest`).
+- Sin despliegue público ni registro de imágenes: la imagen se entrega como artefacto de Actions.
+- El rollback se hace cambiando a la imagen anterior; los datos viven en el `localStorage` de cada dispositivo y no se pierden.
+
+### Evidencia
+
+- [Workflow Verificación completa](https://github.com/lizcast06/PWA-Equipo2/actions/workflows/academic-evaluation.yml): por corrida sube `manifiesto-release-<sha>`, `imagen-release-<sha>` y `reportes-verificacion-<sha>`.
+- [Checks de la actividad: week-10-w10-release-rollback](https://github.com/lizcast06/PWA-Equipo2/actions/workflows/week-10-w10-release-rollback.yml).
+- Corridas en rojo (defecto controlado) y en verde: [`docs/release-process.md`](docs/release-process.md#evidencia-de-ci). Simulacro de rollback con una versión defectuosa: [`docs/runbook.md`](docs/runbook.md) §5.
