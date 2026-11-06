@@ -1,6 +1,22 @@
 # Evidencia individual del proyecto
 
 ---
+# Semana 10: Release reproducible, smoke test y rollback
+
+Equipo 10A: Dana Lizbeth Castañeda Sánchez · Abraham Cervantes Romero · Emmanuel Castro Salvador.
+El SHA final común se entrega en Classroom tras el último commit.
+
+## Emmanuel Castro Salvador
+
+- **Estudiante:** Emmanuel Castro Salvador (líder del equipo).
+- **Commit SHA evaluado:** contribución principal `2611389` (Next 15 por avisos críticos y entorno declarado, [PR #23](https://github.com/lizcast06/PWA-Equipo2/pull/23)), `5b614f1` (versión identificable, `/api/health`, Dockerfile y smoke) y `a55fc18` (runbook y simulacro de rollback), integrados en el [PR #24](https://github.com/lizcast06/PWA-Equipo2/pull/24) con `61e5a31` (etiqueta de versión de la imagen, comentario de Dana); `b68df81` y `d384a94` (Actualizar en la segunda pestaña y documentación del Service Worker, [PR #27](https://github.com/lizcast06/PWA-Equipo2/pull/27)); y en el [PR #26](https://github.com/lizcast06/PWA-Equipo2/pull/26) la corrida en rojo (`4186e66`, revertido en `8a1f866`), `ca0ddbd` (proceso de release con los AC del kit) y `549892d` (workflow y check del kit). CI de `main` tras integrar todo: [verificación completa](https://github.com/lizcast06/PWA-Equipo2/actions/runs/42157799632). El SHA final común se registra en Classroom.
+- **Decisión técnica que puedo explicar:** decidir el rollback con el **smoke y no con el health check**. En el simulacro (`docs/runbook.md` §5) publiqué una imagen con un defecto que compila (`saveNewInspection` lanza un error): Docker la marcó `healthy` y `/api/health` respondió `ok`, pero el smoke falló 1 de 4 en el flujo crítico. Por eso el health check solo dice que el servidor responde, y el smoke incluye capturar sin conexión, reconectar y que quede una sola inspección enviada. También fijé la versión y el commit **al compilar la imagen** (`--build-arg`), para que `/api/health`, Ajustes y las etiquetas de la imagen digan exactamente qué código corre.
+- **Prueba que ejecuté y resultado:** simulacro completo en Docker local: imagen defectuosa `healthy`, smoke 3 pasan y 1 falla; rollback a `5b614f1` y smoke con `EXPECTED_COMMIT` 4 de 4. En CI, el defecto controlado del smoke dejó la [corrida #72](https://github.com/lizcast06/PWA-Equipo2/actions/runs/42153997369) en rojo solo en "Smoke test del release" y aun así subió manifiesto (`smoke: failure`), imagen y reportes. Al revisar el PR #25 probé una actualización real del Service Worker entre dos builds (`main` con v4 → v5): aviso, sin recarga automática, lo escrito se conserva y la app abre sin conexión; con dos pestañas encontré que Actualizar en la segunda no recargaba. La prueba nueva de `tests/e2e/sw-update.spec.ts` falla sin el arreglo y pasa con él. Regresión local: lint, tipos, build, `npm test` 51/51 y E2E 19/19.
+- **Limitación o fallo diagnosticado:** mi primer simulacro no fue válido: el defecto no compilaba, no se creó la imagen y el smoke falló 4 de 4 porque no había servidor, no porque detectara algo; lo repetí con un defecto que compila. También: no hay despliegue público ni registro de imágenes (la imagen es un artefacto de Actions), el rollback detiene el servicio unos segundos, el `imageId` cambia entre motores de Docker (por eso la recuperación compara `sha256` y commit), y si un release no cambia `public/sw.js` el navegador no muestra el aviso de versión nueva. Una prueba de `sw-update.spec.ts` falló 1 vez en 18 ejecuciones locales al esperar que se active el Service Worker; en CI se reintenta una vez.
+- **Cambio que podría defender o modificar en vivo:** agregar una comprobación al smoke (por ejemplo, otra pantalla o un encabezado), cambiar el número de caché de `public/sw.js` y mostrar que aparece el aviso, o repetir el rollback con `docker run` de la imagen anterior y el smoke con su `EXPECTED_COMMIT`.
+- **Uso declarado de IA (herramienta, propósito, validación):** Claude Code (Anthropic), para escribir el Dockerfile, `/api/health`, el smoke, el runbook, el arreglo de las dos pestañas, la documentación del release y revisar los PR del equipo. Validé construyendo y ejecutando la imagen, con el simulacro de la versión defectuosa, con defectos controlados que hacen fallar cada prueba nueva y comprobando que los SHA y enlaces citados existen. Puedo explicar y modificar cada parte.
+
+---
 # Semana 9: Modelo de amenazas y privacidad aplicada
 
 Equipo 10A: Dana Lizbeth Castañeda Sánchez · Abraham Cervantes Romero · Emmanuel Castro Salvador.
