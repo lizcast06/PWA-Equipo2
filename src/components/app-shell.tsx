@@ -40,10 +40,10 @@ export function AppShell({ children, activeRoute = "/", isSyncing = false }: App
   const handleUpdate = () => {
     if (!waitingRegistration) return;
     setApplyingUpdate(true);
-    // Si otra pestaña ya la aplicó, no queda nada esperando: se oculta el aviso.
+    // Si otra pestaña ya la aplicó, la versión nueva ya controla esta pestaña pero su página
+    // sigue siendo la anterior: la persona pidió actualizar, así que se recarga.
     if (!applyServiceWorkerUpdate(waitingRegistration)) {
-      setWaitingRegistration(null);
-      setApplyingUpdate(false);
+      window.location.reload();
     }
   };
 
