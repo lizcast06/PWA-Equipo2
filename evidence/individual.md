@@ -16,6 +16,21 @@ El SHA final común se entrega en Classroom tras el último commit.
 - **Cambio que podría defender o modificar en vivo:** agregar una comprobación al smoke (por ejemplo, otra pantalla o un encabezado), cambiar el número de caché de `public/sw.js` y mostrar que aparece el aviso, o repetir el rollback con `docker run` de la imagen anterior y el smoke con su `EXPECTED_COMMIT`.
 - **Uso declarado de IA (herramienta, propósito, validación):** Claude Code (Anthropic), para escribir el Dockerfile, `/api/health`, el smoke, el runbook, el arreglo de las dos pestañas, la documentación del release y revisar los PR del equipo. Validé construyendo y ejecutando la imagen, con el simulacro de la versión defectuosa, con defectos controlados que hacen fallar cada prueba nueva y comprobando que los SHA y enlaces citados existen. Puedo explicar y modificar cada parte.
 
+## Dana Lizbeth Castañeda Sánchez
+
+- **Estudiante:** Dana Lizbeth Castañeda Sánchez.
+- **Commit SHA evaluado:** `95dbc26645ea51e896ecdbcdea0e9b71b4448167`. Implementación del release reproducible de Semana 10 en el [PR #26](https://github.com/lizcast06/PWA-Equipo2/pull/26).
+
+- **Decisión técnica:** implementé la construcción de una imagen Docker identificada por versión y commit, su ejecución en el puerto `3100`, la validación de `/api/health` y la comparación estricta con `github.sha`. Incorporé pruebas smoke contra el contenedor y la generación de artefactos para garantizar trazabilidad.
+
+- **Prueba y resultado:** publiqué mi rama y revisé la [ejecución #65](https://github.com/lizcast06/PWA-Equipo2/actions/runs/42042250960), que terminó exitosamente. El manifiesto registró `build`, `health`, `commit`, `smoke` y `export` con resultado `success`. Se generaron tres artefactos: imagen Docker, manifiesto y reportes.
+
+- **Limitación:** el workflow construye y verifica el release, pero no realiza un despliegue en producción. Las pruebas utilizan Chromium y datos sintéticos, por lo que no acreditan compatibilidad con todos los navegadores ni condiciones productivas.
+
+- **Cambio que podría defender o modificar en vivo:** agregar una validación de la versión devuelta por `/api/health` contra la versión declarada en `package.json`, y explicar cómo una diferencia haría fallar el job.
+
+- **Uso de IA:** utilicé ChatGPT (OpenAI) como apoyo para comprender el proceso de release, revisar el workflow y estructurar la documentación. Validé los cambios mediante Git y la ejecución real de GitHub Actions, revisando el manifiesto y los artefactos publicados.
+
 ---
 # Semana 9: Modelo de amenazas y privacidad aplicada
 
