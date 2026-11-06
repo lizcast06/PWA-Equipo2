@@ -47,13 +47,17 @@ Si la imagen no está en la máquina, se recupera del artefacto de Actions de es
 
 ## 4. Service Worker después de un rollback
 
-El servidor puede volver atrás en segundos, pero el navegador conserva su Service Worker y su caché. Por eso:
+El servidor puede volver atrás en segundos, pero el navegador conserva su Service Worker y su caché. Desde la semana 10 una versión nueva **no se activa sola**: queda en espera, la app muestra "Hay una versión nueva" y solo cambia cuando la persona pulsa **Actualizar** (la página recarga una vez). El flujo está en `public/sw.js` y `src/lib/pwa/register-service-worker.ts`, y lo prueba `tests/e2e/sw-update.spec.ts`.
 
-- Una **corrección** se publica con un número de caché nuevo en `public/sw.js`: el navegador detecta el archivo distinto y descarta las cachés anteriores al activarse.
-- Si un dispositivo se queda con una versión mala: abrir la app con conexión y recargar; como último recurso, en DevTools → Application → Service Workers → **Unregister** y recargar. No borrar el almacenamiento del sitio si hay inspecciones sin enviar, porque se perderían.
+- **Toda corrección sube el número de caché** de `public/sw.js` (`static-vN`, `runtime-vN`). Si `sw.js` no cambia, el navegador no detecta versión nueva y no aparece el aviso.
+- **Si la versión nueva no completa su precache** (una pantalla obligatoria falla), no se instala y sigue la anterior. Lo prueba "si falla el precache de una pantalla obligatoria…".
+- **Si un dispositivo se quedó con una versión mala del Service Worker:**
+  1. Publicar la corrección (o la imagen anterior) con un número de caché nuevo en `public/sw.js`.
+  2. Abrir la app con conexión: aparece el aviso; guardar lo que se esté capturando y pulsar **Actualizar**.
+  3. Si no aparece, cerrar todas las pestañas de la app y volver a abrirla con conexión.
+  4. Último recurso: DevTools → Application → Service Workers → **Unregister** y recargar. **No** usar "Clear site data" si hay inspecciones pendientes: viven en `localStorage` y se perderían. Primero revisar Pendientes y sincronizar.
+  5. Verificar: en Ajustes, la versión y el commit son los esperados y la app abre sin conexión.
 - JS, CSS y pantallas usan Network-First: con conexión se sirve lo publicado; sin conexión, la última copia guardada.
-
-El flujo de actualización con aviso al usuario y su prueba están en `public/sw.js` y `tests/e2e/sw-update.spec.ts`.
 
 ## 5. Simulacro con una versión defectuosa (3 de noviembre de 2026)
 

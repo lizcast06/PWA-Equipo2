@@ -201,3 +201,32 @@ test("si falla el precache de una pantalla obligatoria, la versión nueva no se 
   await page.goto("/pendientes");
   await expect(pageTitle(page)).toHaveText("Pendientes de envío");
 });
+
+test("con dos pestañas abiertas, Actualizar en la segunda también recarga con la versión nueva", async ({ page, context }) => {
+  await openWithServiceWorker(page);
+  const second = await context.newPage();
+  await second.goto("/inspecciones");
+  await expect.poll(() => second.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true);
+  await installNextVersion(page);
+  await expect(second.getByRole("button", { name: "Actualizar" })).toBeVisible();
+
+  // Sin conexión, para que al recargar la app no registre otra vez /sw.js (ver límites arriba).
+  await context.setOffline(true);
+  await Promise.all([page.waitForEvent("load"), page.getByRole("button", { name: "Actualizar" }).click()]);
+  await expect
+    .poll(() => workerStatesOrNull(page), { timeout: 15_000 })
+    .toEqual({ installing: null, waiting: null, active: NEXT_ACTIVE, controller: NEXT_URL });
+
+  // La segunda pestaña ya está controlada por la versión nueva, pero su página es la anterior.
+  await second.evaluate(() => {
+    (window as unknown as { __paginaAnterior: boolean }).__paginaAnterior = true;
+  });
+  await Promise.all([
+    second.waitForEvent("load", { timeout: 10_000 }),
+    second.getByRole("button", { name: "Actualizar" }).click(),
+  ]);
+  expect(await second.evaluate(() => (window as unknown as { __paginaAnterior?: boolean }).__paginaAnterior ?? false)).toBe(false);
+  await expect(pageTitle(second)).toHaveText("Catálogo de inspecciones");
+  await expect(second.getByTestId("update-banner")).toHaveCount(0);
+  expect((await workerStates(second)).controller).toBe(NEXT_URL);
+});
