@@ -26,7 +26,7 @@ test("pantallas clave cargan y la versión se ve en Ajustes", async ({ page, req
     ["/inspecciones", "Catálogo de inspecciones"],
     ["/inspecciones/nueva", "Nueva inspección"],
     ["/pendientes", "Pendientes de envío"],
-    ["/ajustes", "Ajustes (defecto controlado: debe fallar)"],
+    ["/ajustes", "Ajustes"],
   ]) {
     await page.goto(route);
     await expect(page.locator("main h2").first(), `pantalla ${route}`).toHaveText(title);
