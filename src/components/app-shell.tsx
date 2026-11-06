@@ -3,12 +3,13 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { registerServiceWorker } from "../lib/pwa/register-service-worker";
+import { applyServiceWorkerUpdate, registerServiceWorker } from "../lib/pwa/register-service-worker";
 import { useAppStatus } from "../lib/pwa/use-app-status";
 import { showToast } from "../lib/pwa/toast";
 import { syncPendingInspections } from "../lib/storage/local-store";
 import { dispatchInspectionAlert } from "../lib/notifications/client";
 import { ToastRegion } from "./toast-region";
+import { UpdateBanner } from "./update-banner";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -28,9 +29,23 @@ export function AppShell({ children, activeRoute = "/", isSyncing = false }: App
   const { online, offlineReadiness, pendingCount } = useAppStatus();
   const [autoSyncing, setAutoSyncing] = useState(false);
 
+  // Semana 10: versión nueva del Service Worker esperando a que la persona la acepte.
+  const [waitingRegistration, setWaitingRegistration] = useState<ServiceWorkerRegistration | null>(null);
+  const [applyingUpdate, setApplyingUpdate] = useState(false);
+
   useEffect(() => {
-    registerServiceWorker();
+    registerServiceWorker({ onUpdateReady: setWaitingRegistration });
   }, []);
+
+  const handleUpdate = () => {
+    if (!waitingRegistration) return;
+    setApplyingUpdate(true);
+    // Si otra pestaña ya la aplicó, no queda nada esperando: se oculta el aviso.
+    if (!applyServiceWorkerUpdate(waitingRegistration)) {
+      setWaitingRegistration(null);
+      setApplyingUpdate(false);
+    }
+  };
 
   // Sincronización automática al abrir la app y al recuperar la conexión.
   useEffect(() => {
@@ -107,6 +122,8 @@ export function AppShell({ children, activeRoute = "/", isSyncing = false }: App
           </div>
         </div>
       </header>
+
+      {waitingRegistration && <UpdateBanner onUpdate={handleUpdate} updating={applyingUpdate} />}
 
       {!online && (
         <div role="status" className="bg-amber-500/15 border-b border-amber-500/30 text-amber-200 text-xs text-center px-4 py-2">
