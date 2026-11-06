@@ -14,29 +14,195 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
+
       - name: Instalación limpia
         run: npm ci --no-audit --no-fund
+
       - name: Lint
         run: npm run lint
+
       - name: Tipos
         run: npm run typecheck
+
       - name: Build
         run: npm run build
+
       - name: Suites heredadas (semanas 1–6)
         run: npm run test:legacy
+
       - name: Unit + integración con cobertura
         run: npm run test:coverage
+
       - name: Instalar navegador E2E
         run: npx playwright install --with-deps chromium
+
       - name: E2E (Playwright contra next start)
         run: npm run test:e2e
         env:
           CI: "true"
           E2E_SKIP_BUILD: "1"
+
+      # SEMANA 10: RELEASE REPRODUCIBLE
+      - name: Construir imagen Docker del release
+        id: release_build
+        run: |
+          APP_VERSION=$(node -p "require('./package.json').version")
+          docker build \
+            -t "pwa-inspecciones:${{ github.sha }}" \
+            --build-arg "APP_VERSION=$APP_VERSION" \
+            --build-arg "GIT_SHA=${{ github.sha }}" \
+            .
+
+      - name: Iniciar contenedor Docker
+        run: |
+          docker run -d \
+            --name pwa \
+            -p 3100:3000 \
+            "pwa-inspecciones:${{ github.sha }}"
+
+      - name: Esperar health check del contenedor
+        id: release_health
+        run: |
+          mkdir -p release-evidence
+          for i in $(seq 1 30); do
+            if curl --fail --silent --show-error --connect-timeout 2 --max-time 5 \
+              http://localhost:3100/api/health -o release-evidence/health.json; then
+              echo ""
+              echo "Health check correcto"
+              exit 0
+            fi
+            echo "Esperando que la aplicación esté lista... intento $i"
+            sleep 2
+          done
+
+          echo "ERROR: el contenedor no respondió correctamente"
+          docker logs pwa
+          exit 1
+
+      - name: Verificar commit exacto del contenedor
+        id: release_commit
+        env:
+          EXPECTED_COMMIT: ${{ github.sha }}
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const assert = require('node:assert/strict');
+          const health = JSON.parse(fs.readFileSync('release-evidence/health.json', 'utf8'));
+          assert.ok(process.env.EXPECTED_COMMIT, 'Falta EXPECTED_COMMIT');
+          assert.equal(health.status, 'ok');
+          assert.equal(health.commit, process.env.EXPECTED_COMMIT, 'Commit del contenedor incorrecto');
+          NODE
+
+      - name: Smoke test del release
+        id: release_smoke
+        run: npm run test:smoke
+        env:
+          CI: "true"
+          SMOKE_URL: http://localhost:3100
+          EXPECTED_COMMIT: ${{ github.sha }}
+
+      - name: Exportar imagen comprimida
+        id: release_export
+        if: always()
+        env:
+          RELEASE_COMMIT: ${{ github.sha }}
+          BUILD_OUTCOME: ${{ steps.release_build.outcome }}
+        run: |
+          mkdir -p release-evidence
+          image="pwa-inspecciones:$RELEASE_COMMIT"
+          if ! docker image inspect "$image" >/dev/null 2>&1; then
+            echo "Imagen no disponible; build: $BUILD_OUTCOME" > release-evidence/image-unavailable.txt
+            if [ "$BUILD_OUTCOME" = "success" ]; then exit 1; fi
+            exit 0
+          fi
+          set -o pipefail
+          archive="pwa-inspecciones-$RELEASE_COMMIT.tar.gz"
+          docker save "$image" | gzip > "$archive.part"
+          mv "$archive.part" "$archive"
+          sha256sum "$archive" > "$archive.sha256"
+
+      - name: Conservar diagnóstico del contenedor
+        if: always()
+        run: |
+          mkdir -p release-evidence
+          docker logs pwa > release-evidence/container.log 2>&1 || true
+          docker inspect pwa > release-evidence/container-inspect.json 2>&1 || true
+
+      - name: Generar manifiesto del release
+        if: always()
+        env:
+          RELEASE_COMMIT: ${{ github.sha }}
+          BUILD_OUTCOME: ${{ steps.release_build.outcome }}
+          HEALTH_OUTCOME: ${{ steps.release_health.outcome }}
+          COMMIT_OUTCOME: ${{ steps.release_commit.outcome }}
+          SMOKE_OUTCOME: ${{ steps.release_smoke.outcome }}
+          EXPORT_OUTCOME: ${{ steps.release_export.outcome }}
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const { execFileSync } = require('child_process');
+
+          const commit = process.env.RELEASE_COMMIT;
+          const version = require('./package.json').version;
+          const image = `pwa-inspecciones:${commit}`;
+
+          let imageId = null;
+          try {
+            imageId = execFileSync('docker', [
+              'image', 'inspect', image, '--format', '{{.Id}}'
+            ], { encoding: 'utf8' }).trim();
+          } catch {
+            console.log('La imagen Docker no está disponible.');
+          }
+
+          const manifest = {
+            version,
+            commit,
+            date: new Date().toISOString(),
+            image,
+            imageId,
+            outcomes: {
+              build: process.env.BUILD_OUTCOME,
+              health: process.env.HEALTH_OUTCOME,
+              commit: process.env.COMMIT_OUTCOME,
+              smoke: process.env.SMOKE_OUTCOME,
+              export: process.env.EXPORT_OUTCOME
+            }
+          };
+
+          fs.writeFileSync(
+            'release-manifest.json',
+            JSON.stringify(manifest, null, 2) + '\n'
+          );
+
+          console.log(JSON.stringify(manifest, null, 2));
+          NODE
+
+      - name: Subir manifiesto del release
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: manifiesto-release-${{ github.sha }}
+          if-no-files-found: warn
+          path: release-manifest.json
+
+      - name: Subir imagen comprimida del release
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: imagen-release-${{ github.sha }}
+          if-no-files-found: warn
+          compression-level: 0
+          path: |
+            pwa-inspecciones-*.tar.gz
+            pwa-inspecciones-*.tar.gz.sha256
+            release-evidence/image-unavailable.txt
+
       - name: Reportes y cobertura
         if: always()
         uses: actions/upload-artifact@v4
@@ -47,3 +213,8 @@ jobs:
             coverage/
             test-results/
             playwright-report/
+            release-evidence/
+
+      - name: Limpiar contenedor
+        if: always()
+        run: docker rm -f pwa || true

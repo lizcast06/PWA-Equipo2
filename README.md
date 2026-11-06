@@ -142,3 +142,55 @@ El entorno E2E utiliza `playwright.config.ts` configurado para iniciar `next sta
 * Verificación completa (lint, tipos, build, todas las capas de pruebas y reportes): [Academic Evaluation · Verificación completa](https://github.com/lizcast06/PWA-Equipo2/actions/workflows/academic-evaluation.yml).
 * Checks de la actividad: [week-09-w09-security-privacy](https://github.com/lizcast06/PWA-Equipo2/actions/workflows/week-09-w09-security-privacy.yml).
 * El SHA final y el enlace a su ejecución se registran en la entrega de Classroom, porque escribirlos aquí crearía otro commit distinto al evaluado.
+
+
+
+
+## Semana 10 · Release
+
+Cada commit produce una imagen Docker identificada por su versión y su commit, se prueba con un smoke test contra el contenedor y se guarda como artefacto de Actions. El proceso está en [`docs/release-process.md`](docs/release-process.md) y qué hacer si una versión falla (rollback y recuperación del Service Worker), en [`docs/runbook.md`](docs/runbook.md).
+
+### Ejecución
+
+Requisitos: Node 22 (`.nvmrc`), npm 10 o superior y Docker.
+
+```bash
+npm ci
+make verify
+```
+
+En Windows sin `make`, el equivalente es:
+
+```bash
+npm run lint && npm run typecheck && npm run build && npm test && npm run verify
+```
+
+Imagen, contenedor y smoke (en Bash; `<sha>` es el commit completo):
+
+```bash
+docker build -t pwa-inspecciones:<sha> --build-arg APP_VERSION=0.10.0 --build-arg GIT_SHA=<sha> .
+docker run -d --name pwa -p 3100:3000 pwa-inspecciones:<sha>
+curl -s http://localhost:3100/api/health
+SMOKE_URL=http://localhost:3100 EXPECTED_COMMIT=<sha> npm run test:smoke
+docker rm -f pwa
+```
+
+`npm run test:smoke` sin `SMOKE_URL` compila y levanta la app con `next start` en el puerto 3110.
+
+### Cómo ver qué versión corre
+
+- `GET /api/health` → `{"status":"ok","version":"0.10.0","commit":"<sha>"}`.
+- Pantalla **Ajustes** → "Versión 0.10.0 · commit abc1234".
+- `docker inspect` → etiquetas `org.opencontainers.image.version` y `org.opencontainers.image.revision`.
+
+### Supuestos
+
+- Los de la sección [Supuestos](#supuestos), más: Docker disponible en local y en el runner de GitHub (`ubuntu-latest`).
+- Sin despliegue público ni registro de imágenes: la imagen se entrega como artefacto de Actions.
+- El rollback se hace cambiando a la imagen anterior; los datos viven en el `localStorage` de cada dispositivo y no se pierden.
+
+### Evidencia
+
+- [Workflow Verificación completa](https://github.com/lizcast06/PWA-Equipo2/actions/workflows/academic-evaluation.yml): por corrida sube `manifiesto-release-<sha>`, `imagen-release-<sha>` y `reportes-verificacion-<sha>`.
+- [Checks de la actividad: week-10-w10-release-rollback](https://github.com/lizcast06/PWA-Equipo2/actions/workflows/week-10-w10-release-rollback.yml).
+- Corridas en rojo (defecto controlado) y en verde: [`docs/release-process.md`](docs/release-process.md#evidencia-de-ci). Simulacro de rollback con una versión defectuosa: [`docs/runbook.md`](docs/runbook.md) §5.

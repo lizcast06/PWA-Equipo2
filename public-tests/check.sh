@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-test -e 'docs/threat-model.md' && test -e 'docs/privacy-data-inventory.md' && test -e 'src/lib/security/' && test -e 'tests/security.spec.ts' && test -e 'public/robots.txt'
+test -e 'Dockerfile' && test -e 'docs/release-process.md' && test -e 'docs/runbook.md' && test -e 'tests/smoke.spec.ts' && test -e '.github/workflows/academic-evaluation.yml'
 test -f README.md
 ! rg -n -i '(api[_-]?key|secret|password|token)' --glob '!public-tests/check.sh' .
 echo PUBLIC_OK
